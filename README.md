@@ -4,7 +4,7 @@ Application web statique (HTML/CSS/JS vanilla, aucun build, aucune dépendance) 
 
 ## Fonctionnalités
 
-- **3 cours** : JavaScript — Les bases, HTML — Structurer une page, CSS — Styliser (11 leçons).
+- **3 cours** : JavaScript — Les bases, HTML — Structurer une page, CSS — Styliser (13 leçons).
 - **Leçons interactives** : théorie, exemples de code, quiz corrigés.
 - **Éditeur de code intégré** avec exécution en bac à sable (iframe `sandbox`, isolée de la page).
 - **Correction automatique** :
@@ -12,6 +12,7 @@ Application web statique (HTML/CSS/JS vanilla, aucun build, aucune dépendance) 
   - HTML/CSS : l'exercice est rendu dans un aperçu en direct et vérifié par des tests sur le DOM réel (structure, couleurs calculées, padding, flexbox…).
 - **Suivi de progression** : leçons terminées, XP, série de jours consécutifs, sauvegardés dans `localStorage`.
 - **Intro « boot hacker »** : séquence de démarrage animée (logo pulsant, lignes de boot, ACCÈS AUTORISÉ) à la première visite de chaque session — clic pour passer.
+- **Recherche de leçons** : barre de recherche dans la barre du haut (ou touche `/`) — résultats en direct, navigation clavier flèches + Entrée.
 - **Onboarding** : modal de bienvenue + visite guidée interactive (spotlight), rejouable via le bouton « ? » de la barre de navigation.
 - **Mode hacker** : pluie Matrix sur l'accueil, plein écran via le bouton `>_` de la barre de navigation (préférence mémorisée).
 - **Page Terminal** (`#/terminal`) : cheat sheets CMD / PowerShell / Git Bash avec bouton « Copier », + terminal simulé interactif (tape `help`, `neofetch`, `matrix`, `hack`…).
@@ -44,6 +45,8 @@ js/tour.js      onboarding : modal de bienvenue, visite guidée, confettis, moda
 js/matrix.js    pluie Matrix : accueil + mode hacker plein écran (bouton >_)
 js/terminal.js  page Terminal : cheat sheets CMD/PowerShell/Bash + simulateur
 js/ai.js        CodeBot : assistant IA local (explications, quiz, navigation)
+js/intro.js     intro « boot hacker » au premier chargement de la session
+js/search.js    recherche globale des leçons (touche /)
 ```
 
 ## Ajouter une leçon

@@ -118,6 +118,30 @@ const COURSES = [
             ]
           }
         }
+      },
+      {
+        id: "objets",
+        title: "Les objets",
+        theory: [
+          { type: "text", md: "Un **objet** regroupe plusieurs informations sur une même chose : chaque info a un nom (**propriété**) et une valeur. On accède aux propriétés avec le point `.`" },
+          { type: "code", code: "const hero = {\n  nom: \"Nova\",\n  vie: 100\n};\n\nconsole.log(hero.nom);  // \"Nova\"\nconsole.log(hero.vie);  // 100\n\nhero.xp = 0;  // on peut ajouter une propriété plus tard" },
+          { type: "tip", md: "Un objet, c'est comme une fiche d'identité : `nom`, `vie`, `xp`… et pour lire une info on écrit `hero.nom`. On peut aussi y ranger des fonctions, on les appelle alors des **méthodes**." }
+        ],
+        quiz: [
+          { q: "Comment lire la propriété `nom` de l'objet `hero` ?", options: ["hero.nom", "nom(hero)", "hero->nom"], answer: 0 },
+          { q: "Un objet regroupe…", options: ["une seule valeur", "plusieurs propriétés nommées", "seulement des textes"], answer: 1 }
+        ],
+        exercise: {
+          prompt: "Écris une fonction `presente(hero)` qui retourne « nom a vie points de vie ! » à partir de l'objet reçu. Exemple : presente({nom: \"Nova\", vie: 100}) → « Nova a 100 points de vie ! ».",
+          starter: "function presente(hero) {\n  // ton code ici\n}\n",
+          check: {
+            kind: "run",
+            tests: [
+              { code: "console.log(presente({ nom: \"Nova\", vie: 100 }));", expect: ["Nova a 100 points de vie !"] },
+              { code: "console.log(presente({ nom: \"Zed\", vie: 80 }));", expect: ["Zed a 80 points de vie !"] }
+            ]
+          }
+        }
       }
     ]
   },
@@ -232,6 +256,26 @@ const COURSES = [
           fixedHtml: "<div class=\"carte\">Une carte sympa</div>",
           starter: "/* ton CSS ici */\n",
           check: { kind: "dom", testCode: "const c = document.querySelector('.carte');\nconst s = c && getComputedStyle(c);\ncm(s && s.paddingTop === '16px' && s.borderTopWidth === '2px' && s.borderTopStyle === 'solid', 'Padding 16px et bordure 2px solid appliqués !');" }
+        }
+      },
+      {
+        id: "typo",
+        title: "Texte et polices",
+        theory: [
+          { type: "text", md: "Le **CSS** contrôle aussi le texte : sa **taille** (`font-size`), sa **police** (`font-family`), sa **graisse** (`font-weight`) et son **alignement** (`text-align`)." },
+          { type: "code", code: "p {\n  font-size: 18px;\n  font-family: Georgia, serif;\n  font-weight: bold;\n  text-align: center;\n}" },
+          { type: "tip", md: "`font-weight: bold` (ou `700`) met en gras. `text-align` accepte `center`, `left` ou `right`. Combine deux polices avec une complémentaire : `Georgia, serif` = Georgia d'abord, sinon la police serif par défaut." }
+        ],
+        quiz: [
+          { q: "Quelle propriété met le texte en gras ?", options: ["text-bold", "font-weight", "weight"], answer: 1 },
+          { q: "`text-align: center` sert à…", options: ["centrer le texte", "changer la police", "agrandir le texte"], answer: 0 }
+        ],
+        exercise: {
+          type: "dom",
+          prompt: "Rends le paragraphe .annonce en gras (font-weight: bold) et centré (text-align: center).",
+          fixedHtml: "<p class=\"annonce\">Le site ouvre samedi !</p>",
+          starter: "/* ton CSS ici */\n",
+          check: { kind: "dom", testCode: "const p = document.querySelector('.annonce');\nconst s = p && getComputedStyle(p);\ncm(s && (s.fontWeight === 'bold' || s.fontWeight === '700') && s.textAlign === 'center', 'Texte en gras et centré, parfait !');" }
         }
       },
       {

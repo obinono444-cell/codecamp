@@ -3,6 +3,7 @@ window.CodeCampAdmin = (function () {
   "use strict";
 
   var KEY = "codecamp-admin-v1";
+  var ADMIN_MAIL = "obinono444@gmail.com";
   var state = { emailHash: null, passHash: null, closed: false, message: "", attempts: 0, cooldownUntil: 0 };
   var panel = null, lockEl = null;
 
@@ -139,7 +140,7 @@ window.CodeCampAdmin = (function () {
       '<div class="panel-lockicon">\ud83d\udee1\ufe0f</div>' +
       '<h3>Cr\u00e9er ton compte admin</h3>' +
       '<p class="panel-muted">Seule <strong>ton adresse mail + ton mot de passe</strong> donneront acc\u00e8s \u00e0 ce panneau. Note-les bien !</p>' +
-      '<input id="admin-mail" type="email" placeholder="Ton adresse mail (ex : toi@gmail.com)">' +
+      '<input id="admin-mail" type="email" value="obinono444@gmail.com" readonly title="Adresse admin fixe">' +
       '<input id="admin-p1" type="password" placeholder="Mot de passe (4 caract\u00e8res min.)">' +
       '<input id="admin-p2" type="password" placeholder="Confirme le mot de passe">' +
       '<button id="admin-set" class="panel-btn primary">Cr\u00e9er mon compte admin</button>' +
@@ -147,7 +148,7 @@ window.CodeCampAdmin = (function () {
     var mail = body.querySelector("#admin-mail"), p1 = body.querySelector("#admin-p1"), p2 = body.querySelector("#admin-p2");
     body.querySelector("#admin-set").addEventListener("click", function () {
       var m = (mail.value || "").trim();
-      if (!/^\S+@\S+\.\S+$/.test(m)) { body.querySelector("#admin-err").textContent = "\u274c Adresse mail invalide."; return; }
+      if (mailHash(m) !== mailHash(ADMIN_MAIL)) { body.querySelector("#admin-err").textContent = "\u274c Seule l'adresse " + ADMIN_MAIL + " est admin."; return; }
       if ((p1.value || "").length < 4) { body.querySelector("#admin-err").textContent = "\u274c Mot de passe : 4 caract\u00e8res minimum."; return; }
       if (p1.value !== p2.value) { body.querySelector("#admin-err").textContent = "\u274c Les deux mots de passe ne sont pas identiques."; return; }
       state.emailHash = mailHash(m);
@@ -166,7 +167,7 @@ window.CodeCampAdmin = (function () {
       '<div class="panel-lockicon">\ud83d\udcec</div>' +
       '<h3>Ajoute ton adresse mail admin</h3>' +
       '<p class="panel-muted">Tu avais d\u00e9j\u00e0 un mot de passe : associe maintenant ton adresse mail pour te connecter.</p>' +
-      '<input id="admin-mail" type="email" placeholder="Ton adresse mail (ex : toi@gmail.com)">' +
+      '<input id="admin-mail" type="email" value="obinono444@gmail.com" readonly title="Adresse admin fixe">' +
       '<button id="admin-link" class="panel-btn primary">Associer mon adresse</button>' +
       '<p id="admin-err" class="lock-err"></p>';
     var mail = body.querySelector("#admin-mail");
@@ -187,7 +188,7 @@ window.CodeCampAdmin = (function () {
       '<div class="panel-lockicon">\ud83d\udd10</div>' +
       '<h3>Espace administrateur</h3>' +
       '<p class="panel-muted">Connecte-toi avec ton adresse mail et ton mot de passe.</p>' +
-      '<input id="admin-mail" type="email" placeholder="Adresse mail admin" autocomplete="off">' +
+      '<input id="admin-mail" type="email" value="obinono444@gmail.com" autocomplete="off">' +
       '<input id="admin-pass" type="password" placeholder="Mot de passe admin" autocomplete="off">' +
       '<button id="admin-go" class="panel-btn primary">Se connecter</button>' +
       '<p id="admin-err" class="lock-err"></p>';

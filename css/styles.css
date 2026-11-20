@@ -856,3 +856,43 @@ main { flex: 1; width: 100%; max-width: 900px; margin: 0 auto; padding: 32px 20p
 .lock-auth.col { flex-direction: column; }
 .lock-auth { display: flex; gap: 8px; }
 #lock-screen .lock-card { animation: fadeUp 0.5s ease backwards; }
+
+/* ===== v8 — recherche globale ===== */
+.gsearch { position: relative; }
+#gsearch {
+  width: 230px; padding: 8px 14px 8px 34px;
+  background: var(--card); border: 1px solid var(--border); border-radius: 999px;
+  color: var(--text); font-size: 13.5px; outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, width 0.2s ease;
+}
+#gsearch:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(79, 140, 255, 0.15); width: 270px; }
+.gsearch::before {
+  content: "🔍"; position: absolute; left: 12px; top: 50%; transform: translateY(-50%);
+  font-size: 13px; pointer-events: none; opacity: 0.7;
+}
+.gsearch-pop {
+  position: absolute; top: calc(100% + 8px); right: 0; z-index: 50;
+  width: min(380px, 90vw); max-height: 380px; overflow-y: auto;
+  background: var(--bg-soft); border: 1px solid var(--border); border-radius: 14px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6); padding: 6px;
+  animation: tipIn 0.18s ease backwards;
+}
+.gs-row {
+  display: flex; align-items: center; gap: 10px; width: 100%;
+  background: transparent; border: 0; border-radius: 10px;
+  padding: 9px 10px; cursor: pointer; text-align: left; color: var(--text);
+  transition: background 0.12s ease;
+}
+.gs-row:hover, .gs-row.sel { background: rgba(79, 140, 255, 0.14); }
+.gs-icon { font-size: 18px; }
+.gs-txt { flex: 1; line-height: 1.3; }
+.gs-txt strong { display: block; font-size: 13.5px; font-weight: 600; }
+.gs-txt em { font-style: normal; font-size: 11.5px; color: var(--muted); }
+.gs-arrow { color: var(--accent); opacity: 0; transition: opacity 0.12s ease; }
+.gs-row:hover .gs-arrow, .gs-row.sel .gs-arrow { opacity: 1; }
+.gs-empty { color: var(--muted); font-size: 13px; text-align: center; padding: 12px; }
+
+@media (max-width: 820px) {
+  #gsearch, #gsearch:focus { width: 120px; }
+  .gsearch { order: 3; }
+}
