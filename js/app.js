@@ -158,6 +158,7 @@
     const parts = (location.hash || "#/").replace(/^#\//, "").split("/").filter(Boolean);
     window.scrollTo(0, 0);
     replayRouteAnimation();
+    if (window.CodeCampMatrix) CodeCampMatrix.onRoute(parts[0] || "home");
     if (parts[0] === "course" && parts[1] && findCourse(parts[1])) return renderCourse(findCourse(parts[1]));
     if (parts[0] === "lesson" && parts[1] && parts[2]) {
       const course = findCourse(parts[1]);
@@ -165,6 +166,7 @@
       if (course && lesson) return renderLesson(course, lesson);
     }
     if (parts[0] === "plan") return renderPlan();
+    if (parts[0] === "terminal" && window.CodeCampTerminal) return CodeCampTerminal.render();
     renderHome();
   }
 
@@ -206,6 +208,7 @@
   function renderHome() {
     setActiveNav("home");
     const nextUp = findNextLesson();
+    if (window.CodeCampMatrix) setTimeout(() => CodeCampMatrix.heroHome(document.querySelector(".hero")), 0);
     app.innerHTML = `
       <section class="hero">
         <h1>Apprends à coder, pas à pas</h1>

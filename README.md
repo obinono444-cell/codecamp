@@ -12,6 +12,9 @@ Application web statique (HTML/CSS/JS vanilla, aucun build, aucune dépendance) 
   - HTML/CSS : l'exercice est rendu dans un aperçu en direct et vérifié par des tests sur le DOM réel (structure, couleurs calculées, padding, flexbox…).
 - **Suivi de progression** : leçons terminées, XP, série de jours consécutifs, sauvegardés dans `localStorage`.
 - **Onboarding** : modal de bienvenue + visite guidée interactive (spotlight), rejouable via le bouton « ? » de la barre de navigation.
+- **Mode hacker** : pluie Matrix sur l'accueil, plein écran via le bouton `>_` de la barre de navigation (préférence mémorisée).
+- **Page Terminal** (`#/terminal`) : cheat sheets CMD / PowerShell / Git Bash avec bouton « Copier », + terminal simulé interactif (tape `help`, `neofetch`, `matrix`, `hack`…).
+- **CodeBot, IA intégrée** : assistant local qui explique les notions, lance des quiz et navigue pour toi (« ouvre JavaScript ») — 100 % local, aucune API externe, aucune donnée envoyée.
 - **Animations** : transitions de pages, compteurs animés, confettis et modal de célébration à la fin d'une leçon, coloration syntaxique des exemples.
 - Brouillons de code conservés par leçon, navigation leçon précédente / suivante, plans de cours.
 
@@ -36,6 +39,9 @@ css/styles.css  thème sombre, styles de l'éditeur et des pages, animations
 js/lessons.js   contenu des cours (théorie, quiz, exercices, tests)
 js/app.js       logique : rendu, quiz, éditeur, correcteur, progression
 js/tour.js      onboarding : modal de bienvenue, visite guidée, confettis, modals
+js/matrix.js    pluie Matrix : accueil + mode hacker plein écran (bouton >_)
+js/terminal.js  page Terminal : cheat sheets CMD/PowerShell/Bash + simulateur
+js/ai.js        CodeBot : assistant IA local (explications, quiz, navigation)
 ```
 
 ## Ajouter une leçon

@@ -180,6 +180,8 @@
           <div class="step-card"><span>📖</span><strong>Lis</strong>la leçon : concept + exemple de code</div>
           <div class="step-card"><span>⌨️</span><strong>Code</strong>dans l'éditeur intégré, comme un vrai développeur</div>
           <div class="step-card"><span>✅</span><strong>Vérifie</strong>ton code est corrigé instantanément : +20 XP !</div>
+          <div class="step-card"><span>🤖</span><strong>Demande</strong>à CodeBot, l'IA qui répond à tes questions</div>
+          <div class="step-card"><span>⌨️</span><strong>Pratique</strong>les commandes page Terminal (CMD, PowerShell, Bash)</div>
         </div>
         <p style="color:var(--muted);font-size:14px">Enchaîne les leçons, gagne de l'XP et garde ta série 🔥 — le tout sauvegardé automatiquement.</p>`,
       actions: [
@@ -199,6 +201,8 @@
     runTour([
       { el: "#app .course-card", title: "📚 Choisis un cours", text: "Trois parcours t'attendent : JavaScript, HTML et CSS. Clique sur une carte pour voir ses leçons." },
       { el: "#app .hero .btn-primary", title: "🎯 Continue d'où tu t'es arrêté", text: "Ce bouton t'emmène directement à ta prochaine leçon à valider." },
+      { el: "[data-nav=\"terminal\"]", title: "⌨️ Le Terminal", text: "Les commandes CMD, PowerShell et Git Bash expliquées, plus un mini-terminal simulé pour t'entraîner sans risque." },
+      { el: "#ai-fab", title: "🤖 CodeBot, ton IA", text: "Un assistant qui explique les notions, te pose des quiz et t'ouvre les bonnes pages. Clique sur le robot en bas à droite." },
       { el: "#app .stat-chips", title: "📊 Ta progression, en direct", text: "Leçons finies, XP, série de jours : tout est sauvegardé dans ton navigateur." },
       { el: ".topbar-right .streak", title: "🔥 La série (streak)", text: "Code au moins une leçon chaque jour pour faire grandir ta flamme." }
     ], { finish: "C'est parti 🚀", skip: "Passer", onFinish: () => {} });
