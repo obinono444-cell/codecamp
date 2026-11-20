@@ -107,6 +107,7 @@ window.CodeCampAdmin = (function () {
     buildPanel();
     if (!state.passHash) showSetup();
     else showAuth();
+    openWithAnim();
   }
 
   function showAuth() {
@@ -287,7 +288,8 @@ window.CodeCampAdmin = (function () {
   if (footerBtn) footerBtn.addEventListener("click", openPanel);
 
   document.addEventListener("keydown", function (e) {
-    if (e.ctrlKey && e.altKey && (e.key === "A" || e.key === "a") && !state.closed) {
+    var combo = e.ctrlKey && e.altKey && (e.code === "KeyA" || e.key === "a" || e.key === "A");
+    if (combo && !state.closed) {
       e.preventDefault();
       openPanel();
     }

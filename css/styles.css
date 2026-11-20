@@ -752,3 +752,49 @@ main { flex: 1; width: 100%; max-width: 900px; margin: 0 auto; padding: 32px 20p
 .panel-stats { display: flex; flex-wrap: wrap; gap: 8px; }
 .panel-stats span { font-size: 12.5px; background: var(--card); border: 1px solid var(--border); border-radius: 999px; padding: 5px 12px; }
 .danger-zone { border: 1px dashed rgba(229, 83, 75, 0.4); border-radius: 12px; padding: 12px; }
+
+/* ===== v5 — animation booster ===== */
+.rip { position: relative; overflow: hidden; }
+.ripple {
+  position: absolute; border-radius: 50%; pointer-events: none;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.35) 0%, rgba(255, 255, 255, 0) 65%);
+  transform: scale(0); animation: ripGo 0.55s ease-out forwards;
+}
+@keyframes ripGo { to { transform: scale(1); opacity: 0; } }
+
+.nav a { position: relative; overflow: hidden; }
+.nav a::after {
+  content: ""; position: absolute; left: 12px; right: 12px; bottom: 5px; height: 2px;
+  background: linear-gradient(90deg, var(--accent), var(--accent-2));
+  border-radius: 2px; transform: scaleX(0); transform-origin: left;
+  transition: transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.nav a:hover::after, .nav a.active::after { transform: scaleX(1); }
+
+.progress-fill { transform-origin: left; animation: barIn 0.9s cubic-bezier(0.2, 0.8, 0.2, 1) backwards; }
+@keyframes barIn { from { transform: scaleX(0); } }
+
+.stat-chip { animation: chipFloat 3.6s ease-in-out infinite; }
+.stat-chip:nth-child(2) { animation-delay: 0.4s; }
+.stat-chip:nth-child(3) { animation-delay: 0.8s; }
+.stat-chip:nth-child(4) { animation-delay: 1.2s; }
+@keyframes chipFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-4px); } }
+
+.float-code {
+  position: absolute; font-family: var(--mono); font-weight: 700; z-index: 0;
+  color: rgba(79, 140, 255, 0.16); pointer-events: none; user-select: none;
+  animation: floatCode 9s ease-in-out infinite alternate;
+  font-size: 54px; top: 18px; right: 6%;
+}
+.float-code.c2 { font-size: 42px; top: 54%; right: 22%; color: rgba(157, 92, 255, 0.15); animation-duration: 11s; animation-delay: 0.8s; }
+.float-code.c3 { font-size: 60px; top: 30%; left: 8%; color: rgba(18, 184, 60, 0.14); animation-duration: 13s; animation-delay: 1.6s; }
+.float-code.c4 { font-size: 26px; top: 68%; left: 26%; color: rgba(79, 140, 255, 0.13); letter-spacing: 6px; animation-duration: 15s; animation-delay: 2.4s; }
+@keyframes floatCode {
+  from { transform: translateY(-14px) rotate(-6deg); opacity: 0.5; }
+  to { transform: translateY(16px) rotate(5deg); opacity: 1; }
+}
+
+.course-card:hover ._icon { animation: hueShift 1.2s ease infinite; }
+
+#matrix-canvas.matrix-hero { opacity: 0.45; }
+#lock-screen .lock-card { box-shadow: 0 30px 80px rgba(0, 0, 0, 0.7), 0 0 90px rgba(18, 184, 60, 0.2); }

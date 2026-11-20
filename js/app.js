@@ -211,6 +211,10 @@
     if (window.CodeCampMatrix) setTimeout(() => CodeCampMatrix.heroHome(document.querySelector(".hero")), 0);
     app.innerHTML = `
       <section class="hero">
+        <span class="float-code" aria-hidden="true">&lt;/&gt;</span>
+        <span class="float-code c2" aria-hidden="true">{ }</span>
+        <span class="float-code c3" aria-hidden="true">;</span>
+        <span class="float-code c4" aria-hidden="true">0101</span>
         <h1>Apprends à coder, pas à pas</h1>
         <p class="typing">Des cours interactifs de JavaScript, HTML et CSS : lis la théorie, code dans l'éditeur intégré, et tes exercices sont corrigés instantanément.</p>
         <div class="stat-chips">
@@ -635,6 +639,21 @@ img { max-width: 100%; }
       }, 700);
     }
   }
+
+  document.addEventListener("pointerdown", function (e) {
+    const t = e.target.closest(".btn, .course-card, .term-tab, .ai-chip, .panel-btn, .lesson-row, .cheat-copy");
+    if (!t) return;
+    const r = t.getBoundingClientRect();
+    const d = Math.max(r.width, r.height) * 2;
+    const s = document.createElement("span");
+    s.className = "ripple";
+    s.style.width = s.style.height = d + "px";
+    s.style.left = (e.clientX - r.left - d / 2) + "px";
+    s.style.top = (e.clientY - r.top - d / 2) + "px";
+    t.appendChild(s);
+    t.classList.add("rip");
+    s.addEventListener("animationend", () => s.remove());
+  });
 
   window.addEventListener("hashchange", route);
   refreshBadges();
