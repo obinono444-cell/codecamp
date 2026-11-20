@@ -4,7 +4,7 @@ Application web statique (HTML/CSS/JS vanilla, aucun build, aucune dépendance) 
 
 ## Fonctionnalités
 
-- **3 cours** : JavaScript — Les bases, HTML — Structurer une page, CSS — Styliser (13 leçons).
+- **3 cours** : JavaScript — Les bases, HTML — Structurer une page, CSS — Styliser (15 leçons).
 - **Leçons interactives** : théorie, exemples de code, quiz corrigés.
 - **Éditeur de code intégré** avec exécution en bac à sable (iframe `sandbox`, isolée de la page).
 - **Correction automatique** :

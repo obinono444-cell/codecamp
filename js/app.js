@@ -498,7 +498,7 @@ parent.postMessage({ kind: 'dom-result', id: ${id}, results: _results }, '*');
         <p class="lesson-sub">${course.icon} ${escapeHtml(course.title)} · Leçon ${index + 1}/${course.lessons.length}${done ? " · ✅ Terminée" : ""}</p>
         ${(lesson.theory || []).map(b => {
           const lang = b.lang || (course.id === "css-base" ? "css" : course.id === "html-base" ? "html" : guessLang(b.code));
-          if (b.type === "code") return `<pre class="code-block">${highlight(b.code, lang)}</pre>`;
+          if (b.type === "code") return `<div class="code-wrap"><pre class="code-block">${highlight(b.code, lang)}</pre><button class="code-copy" data-code="${escapeHtml(b.code)}" title="Copier le code">Copier</button></div>`;
           if (b.type === "tip") return `<div class="tip">💡 ${md(b.md)}</div>`;
           return `<div class="theory-block"><p>${md(b.md)}</p></div>`;
         }).join("")}
@@ -639,6 +639,30 @@ img { max-width: 100%; }
       }, 700);
     }
   }
+
+  const topBtn = document.createElement("button");
+  topBtn.id = "to-top";
+  topBtn.innerHTML = "▲";
+  topBtn.title = "Retour en haut";
+  topBtn.setAttribute("aria-label", "Retour en haut");
+  document.body.appendChild(topBtn);
+  topBtn.addEventListener("click", () => window.scrollTo({ top: 0, behavior: "smooth" }));
+  window.addEventListener("scroll", () => {
+    topBtn.classList.toggle("visible", window.scrollY > 400);
+  }, { passive: true });
+
+  document.addEventListener("click", function (e) {
+    const cp = e.target.closest ? e.target.closest(".code-copy") : null;
+    if (!cp) return;
+    const done = () => {
+      cp.textContent = "Copié ✓";
+      cp.classList.add("ok");
+      setTimeout(() => { cp.textContent = "Copier"; cp.classList.remove("ok"); }, 1400);
+    };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(cp.dataset.code || "").then(done, done);
+    } else { done(); }
+  });
 
   document.addEventListener("pointerdown", function (e) {
     const t = e.target.closest(".btn, .course-card, .term-tab, .ai-chip, .panel-btn, .lesson-row, .cheat-copy");

@@ -190,7 +190,6 @@ window.CodeCampAdmin = (function () {
       '<p class="panel-muted">Connecte-toi avec ton adresse mail et ton mot de passe.</p>' +
       '<input id="admin-mail" type="email" value="obinono444@gmail.com" autocomplete="off">' +
       '<input id="admin-pass" type="password" placeholder="Mot de passe admin" autocomplete="off">' +
-      '<p class="panel-muted">Mot de passe par\u00e9faut : <strong>noah159</strong> \u2014 change-le dans le panneau une fois connect\u00e9.</p>' +
       '<button id="admin-go" class="panel-btn primary">Se connecter</button>' +
       '<p id="admin-err" class="lock-err"></p>';
     var mail = body.querySelector("#admin-mail"), pass = body.querySelector("#admin-pass");

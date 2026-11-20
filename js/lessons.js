@@ -142,6 +142,31 @@ const COURSES = [
             ]
           }
         }
+      },
+      {
+        id: "tableaux",
+        title: "Les tableaux",
+        theory: [
+          { type: "text", md: "Un **tableau** (`array`) range plusieurs valeurs dans une seule variable, entre `[ ]`. On lit une case avec son **index**, en commençant à **zéro**." },
+          { type: "code", code: "const couleurs = [\"rouge\", \"vert\", \"bleu\"];\n\nconsole.log(couleurs[0]);     // \"rouge\"\nconsole.log(couleurs.length); // 3\n\ncouleurs.push(\"jaune\");      // ajoute à la fin\nconsole.log(couleurs);" },
+          { type: "tip", md: "`length` donne le nombre d'éléments. `push` ajoute à la fin. Dernier élément : `couleurs[couleurs.length - 1]` — le piège classique, on compte à partir de 0 !" }
+        ],
+        quiz: [
+          { q: "Que vaut `couleurs[0]` si couleurs = [\"rouge\", \"vert\"] ?", options: ["\"rouge\"", "\"vert\"", "1"], answer: 0 },
+          { q: "Quelle propriété donne la taille d'un tableau ?", options: ["size", "length", "count"], answer: 1 }
+        ],
+        exercise: {
+          prompt: "Écris une fonction `premier(liste)` qui retourne le premier élément du tableau reçu. Si le tableau est vide, retourne la chaîne \"vide\".",
+          starter: "function premier(liste) {\n  // ton code ici\n}\n",
+          check: {
+            kind: "run",
+            tests: [
+              { code: "console.log(premier([\"a\", \"b\", \"c\"]));", expect: ["a"] },
+              { code: "console.log(premier([42]));", expect: ["42"] },
+              { code: "console.log(premier([]));", expect: ["vide"] }
+            ]
+          }
+        }
       }
     ]
   },
@@ -208,7 +233,27 @@ const COURSES = [
           starter: "<!-- Ton lien ici -->\n",
           check: { kind: "dom", testCode: "const link = document.querySelector('a[href*=\"example.com\"]');\nconst ok = link && link.textContent.trim().length > 0;\ncm(ok, 'Le lien vers example.com est bien là, avec un texte visible !');" }
         }
-      }
+      },
+      {
+        id: "formulaires",
+        title: "Les formulaires",
+        theory: [
+          { type: "text", md: "Un **formulaire** recueille du texte de l'utilisateur : `<input>` pour une ligne, `<button>` pour valider. L'attribut `placeholder` affiche un exemple gris." },
+          { type: "code", code: '<form>\n  <input placeholder=\"Ton pseudo...\">\n  <button>Commencer !</button>\n</form>\n\n<!-- une case à cocher -->\n<label>\n  <input type=\"checkbox\"> J\'accepte\n</label>' },
+          { type: "tip", md: "`<input>` est auto-fermée (pas de `</input>`). Le `type` change tout : `text`, `checkbox`, `password`, `email`… Le champion du débutant : `type=\"text\"` (par défaut)." }
+        ],
+        quiz: [
+          { q: "Quelle balise crée une ligne de saisie ?", options: ["<input>", "<saisie>", "<form> seul"], answer: 0 },
+          { q: "À quoi sert `placeholder` ?", options: ["À cacher le texte", "À afficher un exemple dans le champ", "À valider le formulaire"], answer: 1 }
+        ],
+        exercise: {
+          type: "dom",
+          prompt: "Crée un formulaire avec un <input> (placeholder \"Ton pseudo...\") et un <button> avec le texte \"C'est parti !\".",
+          fixedHtml: "<!-- écris ton formulaire ici -->",
+          starter: "<!-- écris ton formulaire ici -->\n",
+          check: { kind: "dom", testCode: "const i = document.querySelector('input');\nconst b = document.querySelector('button');\ncm(i && i.placeholder === 'Ton pseudo...', 'Le champ a le bon exemple !');\ncm(b && b.textContent.includes('C\'est parti !'), 'Le bouton dit la bonne phrase !');" }
+        }
+      },
     ]
   },
   {
