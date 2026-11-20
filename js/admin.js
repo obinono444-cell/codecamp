@@ -287,7 +287,7 @@ window.CodeCampAdmin = (function () {
   if (footerBtn) footerBtn.addEventListener("click", openPanel);
 
   document.addEventListener("keydown", function (e) {
-    if (e.ctrlKey && e.shiftKey && (e.key === "A" || e.key === "a") && !state.closed) {
+    if (e.ctrlKey && e.altKey && (e.key === "A" || e.key === "a") && !state.closed) {
       e.preventDefault();
       openPanel();
     }

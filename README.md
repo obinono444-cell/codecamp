@@ -15,7 +15,7 @@ Application web statique (HTML/CSS/JS vanilla, aucun build, aucune dépendance) 
 - **Mode hacker** : pluie Matrix sur l'accueil, plein écran via le bouton `>_` de la barre de navigation (préférence mémorisée).
 - **Page Terminal** (`#/terminal`) : cheat sheets CMD / PowerShell / Git Bash avec bouton « Copier », + terminal simulé interactif (tape `help`, `neofetch`, `matrix`, `hack`…).
 - **CodeBot, IA intégrée** : assistant local qui explique les notions, lance des quiz et navigue pour toi (« ouvre JavaScript ») — 100 % local, aucune API externe, aucune donnée envoyée.
-- **Panneau Admin** : bouton « 🔒 Admin » en pied de page (ou Ctrl+Maj+A). Mot de passe choisi par l'admin, stocké haché ; permet de fermer le site (écran de verrouillage avec message personnalisé pour les visiteurs) et de le rouvrir, de changer le mot de passe et de réinitialiser la progression. Note : le verrou est appliqué par navigateur ; pour fermer le site pour tous, désactiver GitHub Pages.
+- **Panneau Admin** : bouton « 🔒 Admin » en pied de page (ou Ctrl+Alt+A). Mot de passe choisi par l'admin, stocké haché ; permet de fermer le site (écran de verrouillage avec message personnalisé pour les visiteurs) et de le rouvrir, de changer le mot de passe et de réinitialiser la progression. Note : le verrou est appliqué par navigateur ; pour fermer le site pour tous, désactiver GitHub Pages.
 - **Animations** : transitions de pages, compteurs animés, confettis et modal de célébration à la fin d'une leçon, coloration syntaxique des exemples.
 - Brouillons de code conservés par leçon, navigation leçon précédente / suivante, plans de cours.
 
