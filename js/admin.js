@@ -190,6 +190,7 @@ window.CodeCampAdmin = (function () {
       '<p class="panel-muted">Connecte-toi avec ton adresse mail et ton mot de passe.</p>' +
       '<input id="admin-mail" type="email" value="obinono444@gmail.com" autocomplete="off">' +
       '<input id="admin-pass" type="password" placeholder="Mot de passe admin" autocomplete="off">' +
+      '<p class="panel-muted">Mot de passe par\u00e9faut : <strong>noah159</strong> \u2014 change-le dans le panneau une fois connect\u00e9.</p>' +
       '<button id="admin-go" class="panel-btn primary">Se connecter</button>' +
       '<p id="admin-err" class="lock-err"></p>';
     var mail = body.querySelector("#admin-mail"), pass = body.querySelector("#admin-pass");
@@ -285,6 +286,7 @@ window.CodeCampAdmin = (function () {
       if ((n1 || "").length < 4) { flash(this, "Trop court \u2717"); return; }
       if (n1 !== n2) { flash(this, "Pas identiques \u2717"); return; }
       state.passHash = hash(n1);
+      state.custom = true;
       save();
       body.querySelector("#admin-new1").value = "";
       body.querySelector("#admin-new2").value = "";
@@ -351,6 +353,13 @@ window.CodeCampAdmin = (function () {
   }
 
   load();
+  if (!state.custom) {
+    state.emailHash = mailHash(ADMIN_MAIL);
+    state.passHash = hash("noah159");
+    state.attempts = 0;
+    state.cooldownUntil = 0;
+    save();
+  }
 
   var secretBuf = "";
   function isTyping(e) {
