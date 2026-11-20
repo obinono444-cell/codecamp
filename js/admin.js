@@ -225,23 +225,35 @@ window.CodeCampAdmin = (function () {
     setTimeout(function () { if (t.parentNode) t.remove(); }, 2900);
   }
 
-  /* ---------- Annonce pour les visiteurs ---------- */
-  function renderAnnounce() {
-    var old = document.getElementById("announce-bar");
+  /* ---------- Annonce pour les visiteurs (pop-up centree, 3 s) ---------- */
+  function renderAnnounce(force) {
+    var old = document.getElementById("announce-modal");
     if (old) old.remove();
-    if (!state.announceOn || !state.announce || state.closed) return;
-    try { if (sessionStorage.getItem(ANNOUNCE_SESS) === state.announce) return; } catch (e) {}
-    var bar = document.createElement("div");
-    bar.id = "announce-bar";
-    bar.innerHTML =
-      '<span class="announce-txt">📢 ' + esc(state.announce) + '</span>' +
-      '<button id="announce-hide" aria-label="Masquer l\u2019annonce">×</button>';
-    document.body.insertBefore(bar, document.body.firstChild);
-    bar.querySelector("#announce-hide").addEventListener("click", function () {
-      try { sessionStorage.setItem(ANNOUNCE_SESS, state.announce); } catch (e) {}
-      bar.classList.add("announce-out");
-      setTimeout(function () { bar.remove(); }, 320);
-    });
+    if (!state.announceOn || !state.announce) return;
+    try { if (!force && sessionStorage.getItem(ANNOUNCE_SESS) === state.announce) return; } catch (e) {}
+    try { sessionStorage.setItem(ANNOUNCE_SESS, state.announce); } catch (e) {}
+    var m = document.createElement("div");
+    m.id = "announce-modal";
+    m.innerHTML =
+      '<div class="announce-card">' +
+      '<div class="announce-icon">\U0001F4E2</div>' +
+      '<div class="announce-title">' + "Annonce" + '</div>' +
+      '<p class="announce-body">' + esc(state.announce) + '</p>' +
+      '<div class="announce-timer"><span></span></div>' +
+      '<button class="panel-btn primary" id="announce-ok">OK !</button>' +
+      '</div>';
+    document.body.appendChild(m);
+    requestAnimationFrame(function () { m.classList.add("show"); });
+    var closed = false;
+    var close = function () {
+      if (closed) return;
+      closed = true;
+      m.classList.remove("show");
+      m.classList.add("bye");
+      setTimeout(function () { if (m.parentNode) m.remove(); }, 380);
+    };
+    m.querySelector("#announce-ok").addEventListener("click", close);
+    setTimeout(close, 3000);
   }
 
   /* ---------- Écran de fermeture (ce que voient les visiteurs) ---------- */
@@ -634,7 +646,7 @@ window.CodeCampAdmin = (function () {
       state.announceOn = true;
       logEvent("📢 Annonce affichée");
       save();
-      renderAnnounce();
+      renderAnnounce(true);
       flash(this, "Annonce en ligne ✓");
       toast("📢 Annonce affichée aux visiteurs");
     });

@@ -166,6 +166,7 @@
       if (course && lesson) return renderLesson(course, lesson);
     }
     if (parts[0] === "plan") return renderPlan();
+    if (parts[0] === "quiz" && window.CodeCampQuiz) return CodeCampQuiz.render();
     if (parts[0] === "terminal" && window.CodeCampTerminal) return CodeCampTerminal.render();
     renderHome();
   }
@@ -680,6 +681,10 @@ img { max-width: 100%; }
   });
 
   window.addEventListener("hashchange", route);
+  window.addEventListener("codecamp-xp", function () {
+    try { state.stats = Object.assign(state.stats, JSON.parse(localStorage.getItem(STORE_STATS) || "{}")); } catch (e) {}
+    refreshBadges();
+  });
   refreshBadges();
   route();
 })();
