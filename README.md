@@ -11,11 +11,12 @@ Application web statique (HTML/CSS/JS vanilla, aucun build, aucune dépendance) 
   - JavaScript : le code s'exécute dans le bac à sable et des tests comparent la sortie console attendue.
   - HTML/CSS : l'exercice est rendu dans un aperçu en direct et vérifié par des tests sur le DOM réel (structure, couleurs calculées, padding, flexbox…).
 - **Suivi de progression** : leçons terminées, XP, série de jours consécutifs, sauvegardés dans `localStorage`.
+- **Intro « boot hacker »** : séquence de démarrage animée (logo pulsant, lignes de boot, ACCÈS AUTORISÉ) à la première visite de chaque session — clic pour passer.
 - **Onboarding** : modal de bienvenue + visite guidée interactive (spotlight), rejouable via le bouton « ? » de la barre de navigation.
 - **Mode hacker** : pluie Matrix sur l'accueil, plein écran via le bouton `>_` de la barre de navigation (préférence mémorisée).
 - **Page Terminal** (`#/terminal`) : cheat sheets CMD / PowerShell / Git Bash avec bouton « Copier », + terminal simulé interactif (tape `help`, `neofetch`, `matrix`, `hack`…).
 - **CodeBot, IA intégrée** : assistant local qui explique les notions, lance des quiz et navigue pour toi (« ouvre JavaScript ») — 100 % local, aucune API externe, aucune donnée envoyée.
-- **Panneau Admin (invisible pour les visiteurs)** : accès réservé à l'admin — raccourci **Ctrl+Alt+A** ou tape secrètement « admin » au clavier. Mot de passe choisi par l'admin, stocké haché ; permet de fermer le site (écran de verrouillage avec message personnalisé pour les visiteurs) et de le rouvrir, de changer le mot de passe et de réinitialiser la progression. Note : le verrou est appliqué par navigateur ; pour fermer le site pour tous, désactiver GitHub Pages.
+- **Panneau Admin (invisible pour les visiteurs)** : accès réservé à l'admin — raccourci **Ctrl+Alt+A** ou tape secrètement « admin » au clavier. Connexion par **adresse mail + mot de passe** (stockés hachés), notifications toast, avatar admin ; permet de fermer le site (écran de verrouillage avec message personnalisé pour les visiteurs) et de le rouvrir, de changer le mot de passe et de réinitialiser la progression. Note : le verrou est appliqué par navigateur ; pour fermer le site pour tous, désactiver GitHub Pages.
 - **Animations** : transitions de pages, compteurs animés, confettis et modal de célébration à la fin d'une leçon, coloration syntaxique des exemples.
 - Brouillons de code conservés par leçon, navigation leçon précédente / suivante, plans de cours.
 

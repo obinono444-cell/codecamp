@@ -1,10 +1,10 @@
-/* CodeCamp — Panneau Admin : fermer / rouvrir le site, protégé par mot de passe */
+/* CodeCamp — Panneau Admin : accès e-mail + mot de passe, fermer/rouvrir le site */
 window.CodeCampAdmin = (function () {
   "use strict";
 
   var KEY = "codecamp-admin-v1";
-  var state = { passHash: null, closed: false, message: "", attempts: 0, cooldownUntil: 0 };
-  var panel = null, lockEl = null, authBox = null;
+  var state = { emailHash: null, passHash: null, closed: false, message: "", attempts: 0, cooldownUntil: 0 };
+  var panel = null, lockEl = null;
 
   function esc(s) {
     return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
@@ -34,6 +34,10 @@ window.CodeCampAdmin = (function () {
     return "h" + a.toString(36) + "_" + b.toString(36);
   }
 
+  function mailHash(mail) {
+    return hash(String(mail || "").trim().toLowerCase());
+  }
+
   function stats() {
     var done = 0, xp = 0, streak = 0;
     try {
@@ -43,6 +47,22 @@ window.CodeCampAdmin = (function () {
       streak = st.streak || 0;
     } catch (e) {}
     return { done: done, xp: xp, streak: streak };
+  }
+
+  /* ---------- Toasts ---------- */
+  function toast(msg, ok) {
+    var box = document.getElementById("toast-box");
+    if (!box) {
+      box = document.createElement("div");
+      box.id = "toast-box";
+      document.body.appendChild(box);
+    }
+    var t = document.createElement("div");
+    t.className = "toast" + (ok === false ? " bad" : "");
+    t.textContent = msg;
+    box.appendChild(t);
+    setTimeout(function () { t.classList.add("gone"); }, 2400);
+    setTimeout(function () { if (t.parentNode) t.remove(); }, 2900);
   }
 
   /* ---------- Écran de verrouillage (vision visiteurs) ---------- */
@@ -56,7 +76,8 @@ window.CodeCampAdmin = (function () {
       '<div class="lock-icon">\ud83d\udd12</div>' +
       '<h1>CodeCamp est ferm\u00e9</h1>' +
       '<p id="lock-msg">' + esc(state.message || "Le site est momentan\u00e9ment en maintenance. Reviens plus tard !") + '</p>' +
-      '<div class="lock-auth">' +
+      '<div class="lock-auth col">' +
+      '<input id="lock-mail" type="email" placeholder="Adresse mail admin" autocomplete="off">' +
       '<input id="lock-pass" type="password" placeholder="Mot de passe admin" autocomplete="off">' +
       '<button id="lock-unlock">D\u00e9verrouiller</button>' +
       '</div>' +
@@ -65,17 +86,19 @@ window.CodeCampAdmin = (function () {
       '</div>';
     document.body.appendChild(lockEl);
 
+    var mail = lockEl.querySelector("#lock-mail");
     var pass = lockEl.querySelector("#lock-pass");
     lockEl.querySelector("#lock-unlock").addEventListener("click", tryUnlock);
     pass.addEventListener("keydown", function (e) { if (e.key === "Enter") tryUnlock(); });
-    setTimeout(function () { pass.focus(); }, 200);
+    mail.addEventListener("keydown", function (e) { if (e.key === "Enter") pass.focus(); });
+    setTimeout(function () { mail.focus(); }, 200);
 
     function tryUnlock() {
       if (Date.now() < state.cooldownUntil) {
         lockErr("Trop d'essais. Patiente " + Math.ceil((state.cooldownUntil - Date.now()) / 1000) + "s.");
         return;
       }
-      if (hash(pass.value) === state.passHash) {
+      if (mailHash(mail.value) === state.emailHash && hash(pass.value) === state.passHash) {
         state.closed = false;
         state.attempts = 0;
         save();
@@ -83,17 +106,16 @@ window.CodeCampAdmin = (function () {
         location.reload();
       } else {
         state.attempts++;
-        if (state.attempts >= 5) {
-          state.cooldownUntil = Date.now() + 30000;
-        }
+        if (state.attempts >= 5) state.cooldownUntil = Date.now() + 30000;
         save();
         lockErr(state.attempts >= 5
           ? "\ud83d\udeab Trop d'essais. Nouvelle tentative dans 30 s."
-          : "\u274c Mot de passe incorrect (" + state.attempts + "/5)");
+          : "\u274c Mail ou mot de passe incorrect (" + state.attempts + "/5)");
         pass.value = "";
-        lockEl.querySelector(".lock-card").classList.remove("shake");
-        void lockEl.offsetWidth;
-        lockEl.querySelector(".lock-card").classList.add("shake");
+        var card = lockEl.querySelector(".lock-card");
+        card.classList.remove("shake");
+        void card.offsetWidth;
+        card.classList.add("shake");
       }
     }
 
@@ -102,12 +124,61 @@ window.CodeCampAdmin = (function () {
     }
   }
 
-  /* ---------- Authentification admin ---------- */
+  /* ---------- Étapes d'entrée ---------- */
   function openPanel() {
     buildPanel();
-    if (!state.passHash) showSetup();
+    if (!state.passHash && !state.emailHash) showSetup();
+    else if (state.passHash && !state.emailHash) showLinkMail();
     else showAuth();
     openWithAnim();
+  }
+
+  function showSetup() {
+    var body = panel.querySelector("#panel-body");
+    body.innerHTML =
+      '<div class="panel-lockicon">\ud83d\udee1\ufe0f</div>' +
+      '<h3>Cr\u00e9er ton compte admin</h3>' +
+      '<p class="panel-muted">Seule <strong>ton adresse mail + ton mot de passe</strong> donneront acc\u00e8s \u00e0 ce panneau. Note-les bien !</p>' +
+      '<input id="admin-mail" type="email" placeholder="Ton adresse mail (ex : toi@gmail.com)">' +
+      '<input id="admin-p1" type="password" placeholder="Mot de passe (4 caract\u00e8res min.)">' +
+      '<input id="admin-p2" type="password" placeholder="Confirme le mot de passe">' +
+      '<button id="admin-set" class="panel-btn primary">Cr\u00e9er mon compte admin</button>' +
+      '<p id="admin-err" class="lock-err"></p>';
+    var mail = body.querySelector("#admin-mail"), p1 = body.querySelector("#admin-p1"), p2 = body.querySelector("#admin-p2");
+    body.querySelector("#admin-set").addEventListener("click", function () {
+      var m = (mail.value || "").trim();
+      if (!/^\S+@\S+\.\S+$/.test(m)) { body.querySelector("#admin-err").textContent = "\u274c Adresse mail invalide."; return; }
+      if ((p1.value || "").length < 4) { body.querySelector("#admin-err").textContent = "\u274c Mot de passe : 4 caract\u00e8res minimum."; return; }
+      if (p1.value !== p2.value) { body.querySelector("#admin-err").textContent = "\u274c Les deux mots de passe ne sont pas identiques."; return; }
+      state.emailHash = mailHash(m);
+      state.passHash = hash(p1.value);
+      save();
+      body.querySelector("#admin-err").textContent = "";
+      toast("\ud83d\udd10 Compte admin cr\u00e9\u00e9 pour " + m);
+      showDashboard();
+    });
+    mail.focus();
+  }
+
+  function showLinkMail() {
+    var body = panel.querySelector("#panel-body");
+    body.innerHTML =
+      '<div class="panel-lockicon">\ud83d\udcec</div>' +
+      '<h3>Ajoute ton adresse mail admin</h3>' +
+      '<p class="panel-muted">Tu avais d\u00e9j\u00e0 un mot de passe : associe maintenant ton adresse mail pour te connecter.</p>' +
+      '<input id="admin-mail" type="email" placeholder="Ton adresse mail (ex : toi@gmail.com)">' +
+      '<button id="admin-link" class="panel-btn primary">Associer mon adresse</button>' +
+      '<p id="admin-err" class="lock-err"></p>';
+    var mail = body.querySelector("#admin-mail");
+    body.querySelector("#admin-link").addEventListener("click", function () {
+      var m = (mail.value || "").trim();
+      if (!/^\S+@\S+\.\S+$/.test(m)) { body.querySelector("#admin-err").textContent = "\u274c Adresse mail invalide."; return; }
+      state.emailHash = mailHash(m);
+      save();
+      toast("\ud83d\udcec Adresse associ\u00e9e !");
+      showDashboard();
+    });
+    mail.focus();
   }
 
   function showAuth() {
@@ -115,60 +186,42 @@ window.CodeCampAdmin = (function () {
     body.innerHTML =
       '<div class="panel-lockicon">\ud83d\udd10</div>' +
       '<h3>Espace administrateur</h3>' +
-      '<p class="panel-muted">Cet espace est prot\u00e9g\u00e9 par ton mot de passe.</p>' +
+      '<p class="panel-muted">Connecte-toi avec ton adresse mail et ton mot de passe.</p>' +
+      '<input id="admin-mail" type="email" placeholder="Adresse mail admin" autocomplete="off">' +
       '<input id="admin-pass" type="password" placeholder="Mot de passe admin" autocomplete="off">' +
-      '<button id="admin-go" class="panel-btn primary">Entrer</button>' +
+      '<button id="admin-go" class="panel-btn primary">Se connecter</button>' +
       '<p id="admin-err" class="lock-err"></p>';
-    var pass = body.querySelector("#admin-pass");
+    var mail = body.querySelector("#admin-mail"), pass = body.querySelector("#admin-pass");
     pass.focus();
-    body.querySelector("#admin-go").addEventListener("click", function () { checkAuth(pass.value); });
-    pass.addEventListener("keydown", function (e) { if (e.key === "Enter") checkAuth(pass.value); });
+    body.querySelector("#admin-go").addEventListener("click", function () { checkAuth(mail.value, pass.value); });
+    pass.addEventListener("keydown", function (e) { if (e.key === "Enter") checkAuth(mail.value, pass.value); });
   }
 
-  function checkAuth(v) {
+  function checkAuth(mail, pass) {
     if (Date.now() < state.cooldownUntil) {
       panel.querySelector("#admin-err").textContent = "Trop d'essais. Patiente " + Math.ceil((state.cooldownUntil - Date.now()) / 1000) + "s.";
       return;
     }
-    if (hash(v) === state.passHash) {
+    if (mailHash(mail) === state.emailHash && hash(pass) === state.passHash) {
       state.attempts = 0;
       save();
+      toast("\u2705 Bienvenue, administrateur !");
       showDashboard();
     } else {
       state.attempts++;
       if (state.attempts >= 5) state.cooldownUntil = Date.now() + 30000;
       save();
-      panel.querySelector("#admin-err").textContent = state.attempts >= 5 ? "\ud83d\udeab Trop d'essais. Pause de 30 s." : "\u274c Mot de passe incorrect (" + state.attempts + "/5)";
+      panel.querySelector("#admin-err").textContent = state.attempts >= 5 ? "\ud83d\udeab Trop d'essais. Pause de 30 s." : "\u274c Mail ou mot de passe incorrect (" + state.attempts + "/5)";
     }
   }
 
-  function showSetup() {
-    var body = panel.querySelector("#panel-body");
-    body.innerHTML =
-      '<div class="panel-lockicon">\ud83d\udee1\ufe0f</div>' +
-      '<h3>Choisis ton mot de passe admin</h3>' +
-      '<p class="panel-muted">C\u2019est <strong>toi seul</strong> qui pourras fermer et rouvrir le site. Note-le bien !</p>' +
-      '<input id="admin-p1" type="password" placeholder="Mot de passe (4 caract\u00e8res min.)">' +
-      '<input id="admin-p2" type="password" placeholder="Confirme le mot de passe">' +
-      '<button id="admin-set" class="panel-btn primary">Cr\u00e9er mon acc\u00e8s admin</button>' +
-      '<p id="admin-err" class="lock-err"></p>';
-    var p1 = body.querySelector("#admin-p1"), p2 = body.querySelector("#admin-p2");
-    body.querySelector("#admin-set").addEventListener("click", function () {
-      if ((p1.value || "").length < 4) { body.querySelector("#admin-err").textContent = "\u274c 4 caract\u00e8res minimum."; return; }
-      if (p1.value !== p2.value) { body.querySelector("#admin-err").textContent = "\u274c Les deux mots de passe ne sont pas identiques."; return; }
-      state.passHash = hash(p1.value);
-      save();
-      body.querySelector("#admin-err").textContent = "";
-      showDashboard();
-    });
-    p1.focus();
-  }
-
   /* ---------- Tableau de bord ---------- */
-  function showDashboard() {
-    var body = panel.querySelector("#panel-body");
+  function dashboardBody() {
     var s = stats();
-    body.innerHTML =
+    return '<div class="panel-me">' +
+      '<span class="panel-avatar">\ud83d\udc51</span>' +
+      '<div class="panel-me-txt"><strong>Administrateur</strong><em>acc\u00e8s v\u00e9rifi\u00e9 par mail \u2705</em></div>' +
+      '</div>' +
       '<div class="panel-state">' +
       '<span class="state-badge ' + (state.closed ? "off" : "on") + '">' + (state.closed ? "\ud83d\udd34 Site ferm\u00e9" : "\ud83d\udfe2 Site ouvert") + '</span>' +
       '<button id="admin-toggle" class="panel-btn ' + (state.closed ? "" : "danger") + '">' + (state.closed ? "\ud83d\udd13 Rouvrir le site aux visiteurs" : "\ud83d\udeaa Fermer le site (mode maintenance)") + '</button>' +
@@ -179,7 +232,7 @@ window.CodeCampAdmin = (function () {
       '<button id="admin-msg-save" class="panel-btn">Enregistrer le message</button>' +
       '</div>' +
       '<div class="panel-section">' +
-      '<h4>\ud83d\udcca Statistiques du navigateur</h4>' +
+      '<h4>\ud83d\udcca Statistiques de ce navigateur</h4>' +
       '<div class="panel-stats">' +
       '<span>\ud83d\udcd6 ' + s.done + ' le\u00e7ons finies</span>' +
       '<span>\u2b50 ' + s.xp + ' XP</span>' +
@@ -200,7 +253,9 @@ window.CodeCampAdmin = (function () {
       '<h4>\u2139\ufe0f Port\u00e9e du verrou</h4>' +
       '<p class="panel-muted">Ce verrou fonctionne sur ce navigateur, sans serveur. Pour fermer le site <strong>pour tout le monde</strong> : GitHub \u2192 ton d\u00e9p\u00f4t \u2192 Settings \u2192 Pages \u2192 d\u00e9sactiver (ou rendre le d\u00e9p\u00f4t priv\u00e9).</p>' +
       '</div>';
+  }
 
+  function bindDashboard(body) {
     body.querySelector("#admin-toggle").addEventListener("click", function () {
       if (state.closed) {
         state.closed = false;
@@ -211,6 +266,7 @@ window.CodeCampAdmin = (function () {
         state.message = body.querySelector("#admin-msg").value.trim() || state.message;
         state.closed = true;
         save();
+        toast("\ud83d\udeaa Site ferm\u00e9 aux visiteurs");
         closePanel();
         renderLock();
       }
@@ -220,11 +276,11 @@ window.CodeCampAdmin = (function () {
       state.message = body.querySelector("#admin-msg").value.trim();
       save();
       flash(this, "Enregistr\u00e9 \u2713");
+      toast("\ud83d\udcdd Message du verrou enregistr\u00e9");
     });
 
     body.querySelector("#admin-pass-save").addEventListener("click", function () {
       var n1 = body.querySelector("#admin-new1").value, n2 = body.querySelector("#admin-new2").value;
-      var err = body.querySelector("#admin-err-pass");
       if ((n1 || "").length < 4) { flash(this, "Trop court \u2717"); return; }
       if (n1 !== n2) { flash(this, "Pas identiques \u2717"); return; }
       state.passHash = hash(n1);
@@ -232,6 +288,7 @@ window.CodeCampAdmin = (function () {
       body.querySelector("#admin-new1").value = "";
       body.querySelector("#admin-new2").value = "";
       flash(this, "Mot de passe \u00e0 jour \u2713");
+      toast("\ud83d\udd11 Mot de passe mis \u00e0 jour");
     });
 
     body.querySelector("#admin-reset-progress").addEventListener("click", function () {
@@ -245,6 +302,12 @@ window.CodeCampAdmin = (function () {
       } catch (e) {}
       location.reload();
     });
+  }
+
+  function showDashboard() {
+    var body = panel.querySelector("#panel-body");
+    body.innerHTML = dashboardBody();
+    bindDashboard(body);
   }
 
   function flash(btn, t) {
@@ -271,6 +334,10 @@ window.CodeCampAdmin = (function () {
 
   function openWithAnim() {
     panel.classList.add("open");
+    var body = panel.querySelector("#panel-body");
+    if (body) body.querySelectorAll(".panel-section, .panel-state, .panel-me").forEach(function (sec, i) {
+      sec.style.animation = "fadeUp 0.35s ease backwards " + (i * 0.06) + "s";
+    });
   }
 
   function closePanel() {
@@ -310,14 +377,11 @@ window.CodeCampAdmin = (function () {
 
   window.addEventListener("hashchange", onHashChange);
 
-  if (document.getElementById("lock-screen") === null) {
-    /* démarrage : si le site était fermé, on verrouille tout de suite après le rendu */
-    if (state.closed) {
-      if (document.readyState === "loading") {
-        document.addEventListener("DOMContentLoaded", function () { setTimeout(renderLock, 50); });
-      } else {
-        setTimeout(renderLock, 50);
-      }
+  if (state.closed) {
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", function () { setTimeout(renderLock, 50); });
+    } else {
+      setTimeout(renderLock, 50);
     }
   }
 
