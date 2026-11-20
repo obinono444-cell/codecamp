@@ -1041,3 +1041,39 @@ body:has(#maint-bar.show) .topbar { margin-top: 41px; }
   transition: all 0.15s ease; flex: 0 0 auto;
 }
 #announce-hide:hover { color: var(--text); border-color: var(--accent); transform: rotate(90deg); }
+
+/* ===== v12 — connexion Google (admin uniquement) ===== */
+.auth-or {
+  display: flex; align-items: center; gap: 10px; margin: 12px 0 4px;
+  color: var(--muted); font-size: 11.5px; text-transform: uppercase; letter-spacing: 2px;
+}
+.auth-or::before, .auth-or::after { content: ""; flex: 1; height: 1px; background: var(--border); }
+.gbtn-wrap { display: flex; justify-content: center; min-height: 40px; }
+.gbtn-fake {
+  background: var(--card-2); border: 1px solid var(--border); color: var(--muted);
+  border-radius: 999px; padding: 9px 16px; font-size: 13px; cursor: not-allowed; opacity: 0.7;
+}
+.gcfg { text-align: center; margin-top: 8px; }
+.gcfg > button {
+  background: transparent; border: 0; color: var(--muted); font-size: 11.5px;
+  cursor: pointer; text-decoration: underline; padding: 2px;
+}
+.gcfg > button:hover { color: var(--text); }
+.gcfg-pane {
+  margin-top: 10px; text-align: left; background: var(--card); border: 1px solid var(--border);
+  border-radius: 12px; padding: 12px;
+  animation: fadeUp 0.3s ease backwards;
+}
+.gsteps { font-size: 12px; line-height: 1.7; margin-bottom: 8px; }
+.gsteps a { color: var(--accent); }
+.gsteps code, .gorigin {
+  font-family: var(--mono); font-size: 11px; background: var(--bg);
+  border: 1px solid var(--border); border-radius: 6px; padding: 1px 6px;
+  color: #ffd88a; word-break: break-all;
+}
+.lock-google { margin-top: 14px; }
+#lock-screen .gcfg-pane { background: var(--bg-soft); }
+#lock-screen .auth-or { color: #3fd96a; }
+#lock-screen .auth-or::before, #lock-screen .auth-or::after { background: #1c3a25; }
+#lock-screen .gbtn-fake { background: rgba(18, 184, 60, 0.08); border-color: #1c3a25; color: #3fd96a; }
+#lock-screen .gcfg > button { color: #3fd96a; }

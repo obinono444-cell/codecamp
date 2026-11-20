@@ -5,7 +5,9 @@ window.CodeCampAdmin = (function () {
   var KEY = "codecamp-admin-v1";
   var SESS = "codecamp-admin-sess";
   var ANNOUNCE_SESS = "codecamp-announce-dismissed";
+  var GOOGLE_KEY = "codecamp-google-clientid";
   var ADMIN_MAIL = "obinono444@gmail.com";
+  var googleCtx = { inLock: false, preview: false };
   var state = { emailHash: null, passHash: null, closed: false, message: "", attempts: 0, cooldownUntil: 0, announce: "", announceOn: false, closedAt: null, log: [] };
   var panel = null, lockEl = null, maintBar = null, sinceTimer = null;
 
@@ -63,6 +65,141 @@ window.CodeCampAdmin = (function () {
   function fmtDate(t) {
     var d = new Date(t);
     return d.toLocaleDateString("fr-FR") + " " + d.toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" });
+  }
+
+  function getClientId() {
+    try { return (localStorage.getItem(GOOGLE_KEY) || "").trim(); } catch (e) { return ""; }
+  }
+
+  function setClientId(id) {
+    try { localStorage.setItem(GOOGLE_KEY, String(id || "").trim()); } catch (e) {}
+  }
+
+  function b64urlDecode(t) {
+    var b = String(t).replace(/-/g, "+").replace(/_/g, "/");
+    while (b.length % 4) b += "=";
+    var json = decodeURIComponent(Array.prototype.map.call(atob(b), function (c) {
+      return "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2);
+    }).join(""));
+    return JSON.parse(json);
+  }
+
+  function loadGsi(cb) {
+    if (window.google && window.google.accounts && window.google.accounts.id) { cb(); return; }
+    var existing = document.querySelector("script[data-gsi]");
+    if (existing) { existing.addEventListener("load", function () { cb(); }); return; }
+    var s = document.createElement("script");
+    s.src = "https://accounts.google.com/gsi/client";
+    s.async = true; s.defer = true; s.setAttribute("data-gsi", "1");
+    s.onload = function () { cb(); };
+    s.onerror = function () { toast("❌ Impossible de charger Google (connexion ?)", false); };
+    document.head.appendChild(s);
+  }
+
+  function onGoogleCredential(resp) {
+    var email = "";
+    try {
+      var payload = b64urlDecode(resp.credential);
+      email = String(payload.email || "").trim().toLowerCase();
+    } catch (e) {}
+    if (email === ADMIN_MAIL) {
+      setSession();
+      googleCtx = { inLock: false, preview: false };
+      if (googleHostLock()) {
+        if (googlePreviewLock()) {
+          toast("✅ Identifiants Google corrects (aperçu)");
+          closePreview();
+          return;
+        }
+        state.closed = false;
+        state.closedAt = null;
+        state.attempts = 0;
+        logEvent("🔓 Site rouvert (Google)");
+        save();
+        googleCloseLock();
+        location.reload();
+      } else {
+        toast("✅ Connecté avec Google : " + email);
+        if (panel) grantAccess();
+      }
+    } else {
+      var msg = "❌ Ce compte Google (" + (email || "inconnu") + ") n'est pas l'administrateur.";
+      if (googleHostLock() && lockEl) lockEl.querySelector("#lock-err").textContent = msg;
+      else if (panel) panel.querySelector("#admin-err").textContent = msg;
+      toast(msg, false);
+    }
+  }
+
+  function googleHostLock() {
+    return !!lockEl;
+  }
+
+  function googlePreviewLock() {
+    return lockEl && lockEl.classList.contains("is-preview");
+  }
+
+  function googleCloseLock() {
+    if (lockEl) { lockEl.remove(); lockEl = null; }
+    if (sinceTimer) { clearInterval(sinceTimer); sinceTimer = null; }
+  }
+
+  function googleHtml() {
+    return '<div class="auth-or"><span>ou</span></div>' +
+      '<div id="g-btn" class="gbtn-wrap"></div>' +
+      '<div class="gcfg"><button id="g-cfg-toggle" type="button">⚙️ Configurer Google (une fois)</button>' +
+      '<div id="g-cfg" class="gcfg-pane" hidden>' +
+      '<p class="panel-muted gsteps">1. Ouvre <a href="https://console.cloud.google.com/apis/credentials" target="_blank" rel="noopener">console.cloud.google.com → Identifiants</a><br>' +
+      '2. « Créer des identifiants » → « ID client OAuth » → Application Web<br>' +
+      '3. Dans « Origines JavaScript autorisées », ajoute : <code class="gorigin"></code><br>' +
+      '4. Copie l\'ID client (il finit par <code>.apps.googleusercontent.com</code>) et colle-le ici :</p>' +
+      '<input id="g-cfg-input" type="text" placeholder="ID client Google" autocomplete="off">' +
+      '<button id="g-cfg-save" type="button" class="panel-btn">Enregistrer l\'ID</button>' +
+      '</div></div>';
+  }
+
+  function bindGoogle(root) {
+    var cfg = root.querySelector("#g-cfg-toggle");
+    if (!cfg) return;
+    var pane = root.querySelector("#g-cfg");
+    var originEl = root.querySelector(".gorigin");
+    var originUrl = location.origin + location.pathname;
+    if (originEl) originEl.textContent = originUrl;
+    var input = root.querySelector("#g-cfg-input");
+    if (input) input.value = getClientId();
+    cfg.addEventListener("click", function () { pane.hidden = !pane.hidden; });
+    root.querySelector("#g-cfg-save").addEventListener("click", function () {
+      setClientId(input.value);
+      toast("⚙️ ID client Google enregistré");
+      pane.hidden = true;
+      renderGoogleButtons();
+    });
+    renderGoogleButtons();
+  }
+
+  function renderGoogleButtons() {
+    var wraps = document.querySelectorAll("#g-btn");
+    if (!wraps.length) return;
+    var id = getClientId();
+    wraps.forEach(function (w) {
+      w.innerHTML = "";
+      if (!id) {
+        w.innerHTML = '<button type="button" class="gbtn-fake" disabled>Se connecter avec Google ⚙️ (configure d\'abord)</button>';
+        return;
+      }
+    });
+    if (!id) return;
+    loadGsi(function () {
+      try {
+        window.google.accounts.id.initialize({ client_id: id, callback: onGoogleCredential });
+        wraps.forEach(function (w) {
+          if (!w.childNodes.length) {
+            window.google.accounts.id.renderButton(w, { theme: "filled_black", size: "large", text: "signin_with", shape: "pill", width: 280, locale: "fr" });
+          }
+        });
+      } catch (e) {
+        toast("❌ ID client Google invalide", false);
+      }
+    });
   }
 
   function logEvent(label) {
@@ -132,6 +269,9 @@ window.CodeCampAdmin = (function () {
       '<p id="lock-err" class="lock-err" role="alert"></p>' +
       '<p class="lock-foot">Accès réservé à l\u2019administrateur · CodeCamp</p>' +
       '</div>';
+    lockEl.querySelector(".lock-auth").insertAdjacentHTML("afterend", '<div class="lock-google">' + googleHtml() + '</div>');
+    googleCtx = { inLock: true, preview: !!preview };
+    bindGoogle(lockEl);
     document.body.appendChild(lockEl);
     if (preview) {
       var pbar = lockEl.querySelector(".lock-preview-bar");
@@ -310,6 +450,9 @@ window.CodeCampAdmin = (function () {
     pass.focus();
     body.querySelector("#admin-go").addEventListener("click", function () { checkAuth(mail.value, pass.value); });
     pass.addEventListener("keydown", function (e) { if (e.key === "Enter") checkAuth(mail.value, pass.value); });
+    body.querySelector("#admin-err").insertAdjacentHTML("afterend", googleHtml());
+    googleCtx = { inLock: false, preview: false };
+    bindGoogle(body);
   }
 
   function checkAuth(mail, pass) {
