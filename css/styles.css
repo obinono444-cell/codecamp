@@ -927,3 +927,117 @@ main { flex: 1; width: 100%; max-width: 900px; margin: 0 auto; padding: 32px 20p
   .footer { justify-content: center; text-align: center; }
   .footer-v { display: none; }
 }
+
+/* ===== v11 — session admin, barre de maintenance, aperçu, journal, animation d'accès ===== */
+
+/* --- Animation « ACCÈS AUTORISÉ » --- */
+.grant {
+  position: relative; overflow: hidden; border-radius: 14px;
+  background: #04120a; border: 1px solid rgba(18, 184, 60, 0.35);
+  padding: 26px 18px; min-height: 240px;
+  display: flex; flex-direction: column; justify-content: center; gap: 14px;
+  font-family: var(--mono);
+  box-shadow: inset 0 0 40px rgba(18, 184, 60, 0.08);
+}
+.grant::after {
+  content: ""; position: absolute; left: 0; right: 0; height: 42px;
+  background: linear-gradient(180deg, rgba(18, 184, 60, 0) 0%, rgba(18, 184, 60, 0.14) 50%, rgba(18, 184, 60, 0) 100%);
+  animation: grantScan 1.9s linear infinite; pointer-events: none;
+}
+@keyframes grantScan { from { top: -42px; } to { top: 100%; } }
+.grant-icon { text-align: center; font-size: 34px; animation: lockFloat 2.2s ease-in-out infinite; }
+.grant-lines { min-height: 92px; font-size: 12.5px; color: #3fd96a; text-shadow: 0 0 8px rgba(18, 184, 60, 0.5); }
+.grant-line { white-space: nowrap; overflow: hidden; animation: fadeUp 0.2s ease backwards; }
+.grant-bar { height: 6px; border-radius: 999px; background: rgba(18, 184, 60, 0.15); overflow: hidden; }
+.grant-bar span { display: block; height: 100%; width: 0; border-radius: 999px; background: linear-gradient(90deg, #12b83c, #7dffb0); transition: width 0.5s ease; }
+.grant-bar.run span { width: 100%; }
+.grant-ok {
+  text-align: center; font-weight: 800; letter-spacing: 3px; font-size: 16px; color: #3fd96a;
+  opacity: 0; transform: scale(0.85); text-shadow: 0 0 18px rgba(18, 184, 60, 0.8);
+}
+.grant-ok.show { animation: grantOk 0.8s ease forwards; }
+@keyframes grantOk {
+  0% { opacity: 0; transform: scale(0.85); filter: blur(6px); }
+  30% { opacity: 1; transform: scale(1.06); filter: blur(0); }
+  45% { transform: scale(0.99) translateX(-3px); }
+  60% { transform: scale(1.01) translateX(3px); }
+  75% { transform: scale(1); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+/* --- Panel : sections nouvelles --- */
+.panel-btn.ghost { background: rgba(79, 140, 255, 0.08); border-color: rgba(79, 140, 255, 0.35); color: #9cc0ff; }
+.panel-btn.ghost:hover { background: rgba(79, 140, 255, 0.16); border-color: var(--accent); }
+.log-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.log-list li {
+  font-size: 12px; color: var(--muted); background: var(--card);
+  border: 1px solid var(--border); border-left: 3px solid var(--accent);
+  border-radius: 8px; padding: 7px 10px;
+  animation: fadeUp 0.3s ease backwards;
+}
+.log-list li:nth-child(2n) { border-left-color: var(--accent-2); }
+.panel-steps { display: flex; flex-direction: column; gap: 6px; }
+.panel-steps span { font-size: 12.5px; color: var(--muted); background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 7px 10px; }
+
+/* --- Barre de maintenance admin --- */
+#maint-bar {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 900;
+  display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+  padding: 8px 14px;
+  background: linear-gradient(90deg, #2b1a00, #4a2a05);
+  border-bottom: 1px solid rgba(255, 200, 60, 0.4);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+  transform: translateY(-110%); transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+#maint-bar.show { transform: translateY(0); }
+.maint-dot {
+  width: 9px; height: 9px; border-radius: 50%; background: #ffb545;
+  box-shadow: 0 0 10px #ffb545; animation: pulseDot 1.4s ease-in-out infinite; flex: 0 0 auto;
+}
+.maint-txt { font-size: 13px; font-weight: 600; color: #ffd88a; flex: 1; min-width: 200px; }
+.maint-actions { display: flex; gap: 8px; }
+.maint-actions button {
+  background: rgba(255, 200, 60, 0.12); border: 1px solid rgba(255, 200, 60, 0.5);
+  color: #ffd88a; font-size: 12.5px; font-weight: 700; border-radius: 999px;
+  padding: 6px 14px; cursor: pointer; transition: all 0.15s ease; white-space: nowrap;
+}
+.maint-actions button:hover { background: rgba(255, 200, 60, 0.25); transform: translateY(-1px); }
+#maint-reopen { background: linear-gradient(135deg, #12b83c, #0a8f2c) !important; border-color: transparent !important; color: #04220f !important; }
+body:has(#maint-bar.show) .topbar { margin-top: 41px; }
+
+/* --- Aperçu de l'écran de fermeture --- */
+#lock-screen.is-preview { background: radial-gradient(ellipse at center, #0f1512 0%, #050807 70%); }
+.lock-preview-bar {
+  position: absolute; top: 0; left: 0; right: 0; z-index: 5;
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  padding: 10px 16px; background: rgba(79, 140, 255, 0.12);
+  border-bottom: 1px solid rgba(79, 140, 255, 0.4);
+  font-size: 13px; color: #9cc0ff; font-weight: 600;
+  opacity: 0; transform: translateY(-8px); transition: all 0.3s ease;
+}
+.lock-preview-bar.show { opacity: 1; transform: translateY(0); }
+.lock-preview-bar button {
+  background: rgba(79, 140, 255, 0.15); border: 1px solid rgba(79, 140, 255, 0.5);
+  color: #cfe0ff; font-size: 12.5px; font-weight: 700; border-radius: 999px;
+  padding: 6px 14px; cursor: pointer; transition: all 0.15s ease; white-space: nowrap;
+}
+.lock-preview-bar button:hover { background: rgba(79, 140, 255, 0.3); }
+.lock-since { color: #ffd88a; font-size: 12.5px; margin: -8px 0 14px; }
+
+/* --- Bandeau d'annonce --- */
+#announce-bar {
+  display: flex; align-items: center; gap: 10px;
+  padding: 9px 16px;
+  background: linear-gradient(90deg, rgba(79, 140, 255, 0.14), rgba(157, 92, 255, 0.14));
+  border-bottom: 1px solid rgba(79, 140, 255, 0.35);
+  animation: announceIn 0.45s cubic-bezier(0.2, 0.8, 0.2, 1) backwards;
+}
+@keyframes announceIn { from { opacity: 0; transform: translateY(-100%); } }
+#announce-bar.announce-out { opacity: 0; transform: translateY(-100%); transition: all 0.3s ease; }
+.announce-txt { flex: 1; font-size: 13.5px; color: var(--text); }
+#announce-hide {
+  background: transparent; border: 1px solid var(--border); color: var(--muted);
+  width: 26px; height: 26px; border-radius: 50%; cursor: pointer; font-size: 14px; line-height: 1;
+  transition: all 0.15s ease; flex: 0 0 auto;
+}
+#announce-hide:hover { color: var(--text); border-color: var(--accent); transform: rotate(90deg); }
