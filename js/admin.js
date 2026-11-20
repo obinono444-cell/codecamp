@@ -284,14 +284,27 @@ window.CodeCampAdmin = (function () {
 
   load();
 
-  var footerBtn = document.getElementById("admin-open");
-  if (footerBtn) footerBtn.addEventListener("click", openPanel);
+  var secretBuf = "";
+  function isTyping(e) {
+    var t = e.target;
+    return t && (t.tagName === "INPUT" || t.tagName === "TEXTAREA" || t.isContentEditable);
+  }
 
   document.addEventListener("keydown", function (e) {
+    if (state.closed) return;
     var combo = e.ctrlKey && e.altKey && (e.code === "KeyA" || e.key === "a" || e.key === "A");
-    if (combo && !state.closed) {
+    if (combo) {
       e.preventDefault();
       openPanel();
+      return;
+    }
+    if (e.ctrlKey || e.altKey || e.metaKey || isTyping(e) || e.key.length !== 1) return;
+    if (!panel || !panel.classList.contains("open")) {
+      secretBuf = (secretBuf + e.key.toLowerCase()).slice(-5);
+      if (secretBuf === "admin") {
+        secretBuf = "";
+        openPanel();
+      }
     }
   });
 
