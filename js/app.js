@@ -36,6 +36,66 @@
       .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>");
   }
 
+  function highlightGeneric(code, re, classes) {
+    let out = "";
+    let pos = 0;
+    let m;
+    while ((m = re.exec(code)) !== null) {
+      out += escapeHtml(code.slice(pos, m.index));
+      let cls = null;
+      for (let g = 0; g < classes.length; g++) {
+        if (m[g + 1] !== undefined) { cls = classes[g]; break; }
+      }
+      out += cls ? `<span class="${cls}">${escapeHtml(m[0])}</span>` : escapeHtml(m[0]);
+      pos = m.index + m[0].length;
+    }
+    out += escapeHtml(code.slice(pos));
+    return out;
+  }
+
+  function highlightJs(code) {
+    const re = /(\/\/[^\n]*|\/\*[\s\S]*?\*\/)|("(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*'|`(?:[^`\\]|\\.)*`)|\b(const|let|var|function|return|if|else|for|of|while|new|typeof|true|false|null|undefined|console)\b|\b(\d+(?:\.\d+)?)\b/g;
+    return highlightGeneric(code, re, ["tok-com", "tok-str", "tok-kw", "tok-num"]);
+  }
+
+  function highlightCss(code) {
+    const re = /(\/\*[\s\S]*?\*\/)|([.#]?[a-zA-Z][\w-]*(?=\s*\{))|([a-z-]+(?=\s*:))|(#[0-9a-fA-F]{3,8}\b|\b\d+(?:\.\d+)?(?:px|em|%|rem|s)?\b)/g;
+    return highlightGeneric(code, re, ["tok-com", "tok-tag", "tok-attr", "tok-num"]);
+  }
+
+  function highlightHtml(code) {
+    let out = "";
+    let pos = 0;
+    const re = /(<!--[\s\S]*?-->)|(<\/?[a-zA-Z][^>]*>)/g;
+    let m;
+    while ((m = re.exec(code)) !== null) {
+      out += escapeHtml(code.slice(pos, m.index));
+      if (m[1]) {
+        out += `<span class="tok-com">${escapeHtml(m[1])}</span>`;
+      } else {
+        let tag = escapeHtml(m[2]);
+        tag = tag.replace(/([a-zA-Z-]+)=(&quot;|')([^&]*)(&quot;|')/g, '<span class="tok-attr">$1</span>=$2<span class="tok-str">$3</span>$4');
+        out += `<span class="tok-tag">${tag}</span>`;
+      }
+      pos = m.index + m[0].length;
+    }
+    out += escapeHtml(code.slice(pos));
+    return out;
+  }
+
+  function highlight(code, lang) {
+    if (lang === "html") return highlightHtml(code);
+    if (lang === "css") return highlightCss(code);
+    return highlightJs(code);
+  }
+
+  function guessLang(code) {
+    if (/<\/?[a-zA-Z]|<!--/.test(code)) return "html";
+    if (/^[ \t]*[.#]?[a-zA-Z][\w-]*\s*\{/.test(code) && /:\s*[^;]+;/.test(code) && !/\b(function|const|let|console)\b/.test(code)) return "css";
+    return "js";
+  }
+
+
   function dateKey(d) {
     return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
   }
@@ -67,8 +127,28 @@
   }
 
   function refreshBadges() {
-    document.getElementById("xp-total").textContent = state.stats.xp;
+    const xpEl = document.getElementById("xp-total");
+    if (xpEl.textContent !== String(state.stats.xp)) {
+      xpEl.textContent = state.stats.xp;
+      const badge = xpEl.closest(".xp");
+      if (badge) {
+        badge.classList.remove("bump");
+        void badge.offsetWidth;
+        badge.classList.add("bump");
+      }
+    }
     document.getElementById("streak-days").textContent = state.stats.streak;
+  }
+
+  function countUp(el, to, ms) {
+    const from = 0;
+    const start = performance.now();
+    function tick(now) {
+      const t = Math.min(1, (now - start) / ms);
+      el.textContent = Math.round(from + (to - from) * (1 - Math.pow(1 - t, 3)));
+      if (t < 1) requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
   }
 
   function findCourse(id) { return COURSES.find(c => c.id === id); }
@@ -77,6 +157,7 @@
   function route() {
     const parts = (location.hash || "#/").replace(/^#\//, "").split("/").filter(Boolean);
     window.scrollTo(0, 0);
+    replayRouteAnimation();
     if (parts[0] === "course" && parts[1] && findCourse(parts[1])) return renderCourse(findCourse(parts[1]));
     if (parts[0] === "lesson" && parts[1] && parts[2]) {
       const course = findCourse(parts[1]);
@@ -85,6 +166,12 @@
     }
     if (parts[0] === "plan") return renderPlan();
     renderHome();
+  }
+
+  function replayRouteAnimation() {
+    app.classList.remove("route-fade");
+    void app.offsetWidth;
+    app.classList.add("route-fade");
   }
 
   function setActiveNav(name) {
@@ -122,7 +209,13 @@
     app.innerHTML = `
       <section class="hero">
         <h1>Apprends à coder, pas à pas</h1>
-        <p>Des cours interactifs de JavaScript, HTML et CSS : lis la théorie, code dans l'éditeur intégré, et tes exercices sont corrigés instantanément.</p>
+        <p class="typing">Des cours interactifs de JavaScript, HTML et CSS : lis la théorie, code dans l'éditeur intégré, et tes exercices sont corrigés instantanément.</p>
+        <div class="stat-chips">
+          <span class="stat-chip">📚 <strong id="stat-lessons">0</strong> leçons</span>
+          <span class="stat-chip">✅ <strong id="stat-done">0</strong> terminées</span>
+          <span class="stat-chip">⭐ <strong id="stat-xp">0</strong> XP</span>
+          <span class="stat-chip">🔥 <strong id="stat-streak">0</strong> j d'affilée</span>
+        </div>
         ${nextUp
           ? `<a class="btn btn-primary" href="#/lesson/${nextUp.course.id}/${nextUp.lesson.id}">${doneCount() > 0 ? "▶ Continuer : " : "🚀 Commencer : "}${escapeHtml(nextUp.lesson.title)}</a>`
           : `<a class="btn btn-primary" href="#/plan">🎉 Tout le parcours est terminé — voir mon plan</a>`}
@@ -140,6 +233,10 @@
           </a>`;
         }).join("")}
       </section>`;
+    countUp(document.getElementById("stat-lessons"), COURSES.reduce((n, c) => n + c.lessons.length, 0), 700);
+    countUp(document.getElementById("stat-done"), doneCount(), 700);
+    countUp(document.getElementById("stat-xp"), state.stats.xp, 900);
+    document.getElementById("stat-streak").textContent = state.stats.streak;
   }
 
   function renderCourse(course) {
@@ -393,7 +490,8 @@ parent.postMessage({ kind: 'dom-result', id: ${id}, results: _results }, '*');
         <h2>${escapeHtml(lesson.title)}</h2>
         <p class="lesson-sub">${course.icon} ${escapeHtml(course.title)} · Leçon ${index + 1}/${course.lessons.length}${done ? " · ✅ Terminée" : ""}</p>
         ${(lesson.theory || []).map(b => {
-          if (b.type === "code") return `<pre class="code-block">${escapeHtml(b.code)}</pre>`;
+          const lang = b.lang || (course.id === "css-base" ? "css" : course.id === "html-base" ? "html" : guessLang(b.code));
+          if (b.type === "code") return `<pre class="code-block">${highlight(b.code, lang)}</pre>`;
           if (b.type === "tip") return `<div class="tip">💡 ${md(b.md)}</div>`;
           return `<div class="theory-block"><p>${md(b.md)}</p></div>`;
         }).join("")}
@@ -484,6 +582,20 @@ img { max-width: 100%; }
         out.textContent = verdict.message;
       }
       if (verdict.pass && !isDone(course.id, lesson.id)) completeLesson(course.id, lesson.id);
+      if (verdict.pass) {
+        if (window.CodeCampUI) {
+          CodeCampUI.spawnConfetti();
+          const next = course.lessons[index + 1];
+          CodeCampUI.showModal({
+            icon: "🎉",
+            heading: "Leçon terminée !",
+            html: `<p style="color:var(--muted)">Exercice validé : <strong style="color:var(--yellow)">+20 XP</strong> ${state.stats.streak > 1 ? "· série de " + state.stats.streak + " jours 🔥" : ""}</p>`,
+            actions: next
+              ? [{ label: "Leçon suivante →", primary: true, href: `#/lesson/${course.id}/${next.id}` }, { label: "Rester ici" }]
+              : [{ label: "Voir mon plan 🏁", primary: true, href: "#/plan" }, { label: "Rester ici" }]
+          });
+        }
+      }
     }
 
     checkBtn.addEventListener("click", verify);
@@ -506,6 +618,18 @@ img { max-width: 100%; }
       });
     } else {
       updatePreview();
+    }
+
+    if (window.CodeCampUI && !CodeCampUI.marks.hintLesson && lesson.exercise) {
+      CodeCampUI.marks.hintLesson = true;
+      CodeCampUI.saveMarks();
+      setTimeout(() => {
+        CodeCampUI.runTour([
+          { el: "#exercise .theory-anchor, .exercise h3", title: "⌨️ C'est ici que tu codes", text: "Remplace les commentaires par ta solution. Tu peux taper, corriger, recommencer autant de fois que tu veux." },
+          { el: "#btn-check", title: "✅ Vérification automatique", text: "Un clic et ton code est testé : réussi = +20 XP et leçon validée !" },
+          { el: "#result-out", title: "👀 Résultat instantané", text: isDom ? "Ta page s'affiche en direct, et le verdict apparaît ici." : "La console affiche ce que ton code produit, et le verdict apparaît ici." }
+        ], { finish: "Compris !", skip: "Passer" });
+      }, 700);
     }
   }
 

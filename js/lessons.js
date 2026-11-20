@@ -73,7 +73,7 @@ const COURSES = [
         id: "conditions",
         title: "Les conditions",
         theory: [
-          { type: "text", md: "Avec `if` / `else`, ton programmes prend des **décisions** : il exécute un bloc seulement si une condition est vraie." },
+          { type: "text", md: "Avec `if` / `else`, ton programme prend des **décisions** : il exécute un bloc seulement si une condition est vraie." },
           { type: "code", code: "const temperature = 28;\n\nif (temperature > 25) {\n  console.log(\"Il fait chaud\");\n} else {\n  console.log(\"Il fait frais\");\n}" },
           { type: "tip", md: "Opérateurs de comparaison : `===` (égal à), `!==` (différent de), `>` `<` `>=` `<=`. Combine-les avec `&&` (et) et `||` (ou). Attention : `===` compare aussi le type, c'est lui qu'on utilise." }
         ],
@@ -170,7 +170,7 @@ const COURSES = [
         id: "liens-images",
         title: "Liens et images",
         theory: [
-          { type: "text", md: "Un **lien** se crée avec `<a>` et son attribut `href`. Une **image** avec `<img>` et ses attributs `src` (le chemin) et `alt` (description). Les images et les liens `a` n'ont pas de contenu à l'intérieur pour img." },
+          { type: "text", md: "Un **lien** se crée avec `<a>` et son attribut `href`. Une **image** se crée avec `<img>` et ses attributs `src` (le chemin de l'image) et `alt` (sa description) : c'est une balise auto-fermée, elle n'a pas de balise de fin." },
           { type: "code", code: "<a href=\"https://example.com\">Visiter le site</a>\n\n<img src=\"chat.jpg\" alt=\"Un chat endormi\">\n\n<a href=\"https://example.com\">\n  <img src=\"banniere.jpg\" alt=\"Bannière\">\n</a>" },
           { type: "tip", md: "L'attribut `alt` est obligatoire : il décrit l'image pour les non-voyants et remplace l'image si elle ne charge pas." }
         ],
@@ -182,7 +182,7 @@ const COURSES = [
           type: "dom",
           prompt: "Ajoute un lien vers https://example.com (href) avec un texte visible.",
           starter: "<!-- Ton lien ici -->\n",
-          check: { kind: "dom", testCode: "const link = document.querySelector('a[href*=\"example.com\"]');\nconst ok = link && link.textContent.trim().length > 0;\ncm(ok, 'Joue le rôle de lien vers example.com avec du texte !');" }
+          check: { kind: "dom", testCode: "const link = document.querySelector('a[href*=\"example.com\"]');\nconst ok = link && link.textContent.trim().length > 0;\ncm(ok, 'Le lien vers example.com est bien là, avec un texte visible !');" }
         }
       }
     ]
@@ -238,7 +238,7 @@ const COURSES = [
         id: "flexbox",
         title: "Flexbox : aligner",
         theory: [
-          { type: "text", md: "**Flexbox** dispose en ligne d'aligner facilement des éléments : on déclare `display: flex` sur le parent, puis on contrôle l'arrangement." },
+          { type: "text", md: "**Flexbox** permet d'aligner et de répartir facilement des éléments : on déclare `display: flex` sur le parent, puis on contrôle l'arrangement." },
           { type: "code", code: ".menu {\n  display: flex;\n  gap: 12px;\n  justify-content: space-between;\n  align-items: center;\n}" },
           { type: "tip", md: "`justify-content` aligne sur l'axe principal, `align-items` sur l'axe secondaire. `gap` crée un espace régulier entre les éléments." }
         ],

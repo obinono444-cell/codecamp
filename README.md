@@ -11,6 +11,8 @@ Application web statique (HTML/CSS/JS vanilla, aucun build, aucune dépendance) 
   - JavaScript : le code s'exécute dans le bac à sable et des tests comparent la sortie console attendue.
   - HTML/CSS : l'exercice est rendu dans un aperçu en direct et vérifié par des tests sur le DOM réel (structure, couleurs calculées, padding, flexbox…).
 - **Suivi de progression** : leçons terminées, XP, série de jours consécutifs, sauvegardés dans `localStorage`.
+- **Onboarding** : modal de bienvenue + visite guidée interactive (spotlight), rejouable via le bouton « ? » de la barre de navigation.
+- **Animations** : transitions de pages, compteurs animés, confettis et modal de célébration à la fin d'une leçon, coloration syntaxique des exemples.
 - Brouillons de code conservés par leçon, navigation leçon précédente / suivante, plans de cours.
 
 ## Lancer l'application
@@ -30,9 +32,10 @@ python3 -m http.server 8000
 
 ```
 index.html      page principale (SPA, routage par hash)
-css/styles.css  thème sombre, styles de l'éditeur et des pages
+css/styles.css  thème sombre, styles de l'éditeur et des pages, animations
 js/lessons.js   contenu des cours (théorie, quiz, exercices, tests)
 js/app.js       logique : rendu, quiz, éditeur, correcteur, progression
+js/tour.js      onboarding : modal de bienvenue, visite guidée, confettis, modals
 ```
 
 ## Ajouter une leçon
