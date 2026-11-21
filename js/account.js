@@ -125,6 +125,10 @@ window.CodeCampAccount = (function () {
         return '<button class="av" data-av="' + a + '">' + a + '</button>';
       }).join("") +
       '</div></div>' +
+      '<div class="drop-ach">' +
+      '<span class="drop-ach-t">🏆 Trophées ' + (window.CodeCampAchieve ? CodeCampAchieve.unlockedCount() + '/' + CodeCampAchieve.grid().match(/ach /g) : '') + '</span>' +
+      (window.CodeCampAchieve ? CodeCampAchieve.grid() : '') +
+      '</div>' +
       '<button class="drop-btn" id="drop-pass">🔑 Changer de mot de passe</button>' +
       '<button class="drop-btn danger" id="drop-logout">🚪 Se déconnecter</button>';
     document.body.appendChild(drop);
@@ -222,6 +226,11 @@ window.CodeCampAccount = (function () {
     if (first) setTimeout(function () { first.focus(); }, 150);
     var btn = body.querySelector("button[type=submit]");
     if (btn) btn.addEventListener("click", btn.dataset.act === "login" ? tryLogin : btn.dataset.act === "signup" ? trySignup : tryPass);
+    body.addEventListener("keydown", function (e) {
+      if (e.key !== "Enter") return;
+      e.preventDefault();
+      if (btn) btn.click();
+    });
   }
 
   function formLogin() {
@@ -279,6 +288,7 @@ window.CodeCampAccount = (function () {
     setCurrent({ pseudo: pseudo, avatar: "🐱" });
     closeModal();
     renderButton();
+    window.dispatchEvent(new Event("codecamp-account"));
     toast("🎉 Compte créé — bienvenue " + pseudo + " !");
     window.CodeCampUI && window.CodeCampUI.spawnConfetti && window.CodeCampUI.spawnConfetti();
   }

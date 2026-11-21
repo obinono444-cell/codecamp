@@ -167,6 +167,42 @@ const COURSES = [
             ]
           }
         }
+      },
+      {
+        id: "json",
+        title: "JSON : parler aux donn\u00e9es",
+        theory: [
+          { type: "text", md: "**JSON** est le format universel pour \u00e9changer des donn\u00e9es (API, sauvegardes...). JavaScript sait le lire avec `JSON.stringify()` (objet \u2192 texte) et `JSON.parse()` (texte \u2192 objet)." },
+          { type: "code", code: 'const joueur = { nom: "Nova", niveau: 3 };\nconst texte = JSON.stringify(joueur);\nconsole.log(texte);\n\nconst retour = JSON.parse(texte);\nconsole.log(retour.niveau);' },
+          { type: "tip", md: "`stringify` transforme un objet en **texte** qu'on peut envoyer ou sauvegarder. `parse` fait l'inverse : magique pour sauver la progression d'un jeu \ud83c\udfae" }
+        ],
+        quiz: [
+          { q: "Quelle m\u00e9thode transforme un objet en texte JSON ?", options: ["JSON.parse", "JSON.stringify", "JSON.read"], answer: 1 },
+          { q: "Apr\u00e8s `JSON.parse('{\"a\":2}')`, que vaut `.a` ?", options: ["Le texte \"a\"", "Le nombre 2", "Une erreur"], answer: 1 }
+        ],
+        exercise: {
+          prompt: "Ta mission : cr\u00e9er une **sauvegarde de jeu** ! Cr\u00e9e une constante `jeu` poss\u00e9dant seulement la propri\u00e9t\u00e9 `titre` \u00e9gale \u00e0 « CodeCamp » (avec les guillemets), puis affiche `JSON.stringify(jeu)`. Objectif exact : {\"titre\":\"CodeCamp\"}",
+          starter: '// Objectif exact : {"titre":"CodeCamp"}\n// 1) Cr\u00e9e l objet jeu avec la propri\u00e9t\u00e9 titre\n// 2) Affiche-le avec JSON.stringify\n\nconst jeu = {\n  // titre: ...\n};\n\nconsole.log(JSON.stringify(jeu));\n',
+          check: { kind: "run", expected: ['{"titre":"CodeCamp"}'] }
+        }
+      },
+      {
+        id: "debug",
+        title: "Chercher et corriger les bugs",
+        theory: [
+          { type: "text", md: "Un **bug** est une erreur dans le code. Le r\u00e9flexe de pro : lire le message d'erreur, tester petit \u00e0 petit, et afficher des points de rep\u00e8re avec `console.log()`." },
+          { type: "code", code: 'let total = 10;\ntotal = total + 5;\n// Petit pi\u00e8ge classique : confondre + (addition) et concat\u00e9nation\nconsole.log(total);\nconsole.log("10" + 5); // "105" : le texte colle le nombre !' },
+          { type: "tip", md: "Astuce : quand un calcul se comporte bizarrement, affiche `typeof maValeur` \u2014 tu verras vite si tu manipules un texte au lieu d'un nombre." }
+        ],
+        quiz: [
+          { q: "Que vaut `\"10\" + 5` ?", options: ["15", "\"105\"", "NaN"], answer: 1 },
+          { q: "Quel outil affiche une valeur pendant qu'on debug ?", options: ["console.log()", "console.montrer()", "alert.print()"], answer: 0 }
+        ],
+        exercise: {
+          prompt: "Le code suivant devait afficher 15 mais affiche « 105 » ! Corrige-le pour qu'il affiche bien le nombre 15 (astuce : `Number(\"10\")` transforme un texte en nombre).",
+          starter: '// Corrige le bug pour afficher 15\n\nconst texte = "10";\nconst total = texte + 5;\n\nconsole.log(total);\n',
+          check: { kind: "run", expected: ["15"] }
+        }
       }
     ]
   },

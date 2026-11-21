@@ -1229,3 +1229,24 @@ body:has(#maint-bar.show) .topbar { margin-top: 41px; }
   .acc-name { display: none; }
   .account-btn { padding: 5px 6px; }
 }
+
+/* ===== v14 — trophées (succès) + polish ===== */
+.drop-ach { margin: 12px 0 4px; }
+.drop-ach-t { display: block; font-size: 11.5px; color: var(--muted); margin-bottom: 8px; }
+.ach-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
+.ach {
+  display: flex; flex-direction: column; align-items: center; gap: 3px;
+  background: var(--card); border: 1px solid var(--border); border-radius: 10px;
+  padding: 7px 3px; cursor: default; transition: all 0.15s ease; min-width: 0;
+}
+.ach:hover { transform: translateY(-2px); border-color: var(--accent); }
+.ach-icon { font-size: 17px; filter: grayscale(1) opacity(0.5); }
+.ach.on .ach-icon { filter: none; animation: achPop 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) backwards; }
+@keyframes achPop { from { transform: scale(0) rotate(-30deg); } }
+.ach.on { border-color: rgba(227, 179, 65, 0.5); background: rgba(227, 179, 65, 0.07); }
+.ach-name { font-size: 9px; color: var(--muted); text-align: center; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ach.on .ach-name { color: #ffd88a; font-weight: 700; }
+.toast-ach {
+  border-color: rgba(227, 179, 65, 0.6) !important; color: #ffd88a !important;
+  font-weight: 700; box-shadow: 0 8px 30px rgba(227, 179, 65, 0.15);
+}
