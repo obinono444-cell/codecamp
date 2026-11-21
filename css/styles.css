@@ -1320,6 +1320,7 @@ body:has(#maint-bar.show) .topbar { margin-top: 41px; }
 .simon-grid { display: grid; grid-template-columns: repeat(2, 120px); gap: 12px; justify-content: center; }
 .spad {
   aspect-ratio: 1; border-radius: 20px; border: 1px solid var(--border);
+  background: var(--bg);
   background: color-mix(in srgb, var(--pc) 18%, var(--bg));
   color: var(--pc); font-size: 26px; cursor: pointer; transition: all 0.15s ease;
 }
