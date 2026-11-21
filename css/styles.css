@@ -1250,3 +1250,86 @@ body:has(#maint-bar.show) .topbar { margin-top: 41px; }
   border-color: rgba(227, 179, 65, 0.6) !important; color: #ffd88a !important;
   font-weight: 700; box-shadow: 0 8px 30px rgba(227, 179, 65, 0.15);
 }
+
+/* ===== v15 — mini-jeux arcade ===== */
+.game-card {
+  max-width: 520px; margin: 0 auto 30px; background: var(--card);
+  border: 1px solid var(--border); border-radius: 20px; padding: 22px;
+  animation: fadeUp 0.4s ease backwards;
+}
+.game-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.game-head h3 { margin: 0; font-size: 19px; }
+.game-best { font-size: 13px; color: #ffd88a; font-weight: 700; white-space: nowrap; }
+.game-sub { color: var(--muted); font-size: 13.5px; margin: 8px 0 14px; }
+.game-hud { display: flex; align-items: center; gap: 12px; margin-top: 12px; }
+.game-score { font-weight: 800; font-size: 16px; color: var(--accent); }
+.game-lives { float: none; }
+#snake-canvas {
+  display: block; margin: 0 auto; width: min(360px, calc(100vw - 90px)); height: min(360px, calc(100vw - 90px));
+  border-radius: 14px; border: 1px solid var(--border);
+  box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.5), 0 10px 30px rgba(0, 0, 0, 0.4);
+}
+.dpad { display: grid; grid-template-columns: repeat(3, 56px); gap: 6px; justify-content: center; margin: 14px 0 4px; }
+.dp {
+  height: 46px; font-size: 19px; border-radius: 12px; border: 1px solid var(--border);
+  background: var(--bg); cursor: pointer; transition: all 0.12s ease; touch-action: manipulation;
+}
+.dp:hover { border-color: var(--accent); transform: scale(1.06); }
+.dp:active { transform: scale(0.94); background: rgba(79, 140, 255, 0.15); }
+
+.mem-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; max-width: 420px; margin: 0 auto; }
+.mem-card {
+  position: relative; aspect-ratio: 1; border: 0; border-radius: 14px; cursor: pointer;
+  background: transparent; perspective: 500px; padding: 0;
+}
+.mem-front, .mem-back {
+  position: absolute; inset: 0; display: grid; place-items: center; border-radius: 14px;
+  backface-visibility: hidden; transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
+  font-family: var(--mono); font-weight: 800; font-size: 22px;
+}
+.mem-front { background: linear-gradient(135deg, #1b2440, #232c4d); color: #4f8cff; border: 1px solid rgba(79, 140, 255, 0.3); }
+.mem-card.on .mem-front, .mem-card.win .mem-front { transform: rotateY(180deg); }
+.mem-back {
+  background: var(--bg); color: #ffd88a; border: 1px solid var(--border);
+  transform: rotateY(180deg);
+}
+.mem-card.on .mem-back { transform: rotateY(360deg); box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4); }
+.mem-card.win .mem-back {
+  background: rgba(18, 184, 60, 0.14); color: #3fd96a; border-color: rgba(18, 184, 60, 0.5);
+  animation: qGood 0.4s ease;
+}
+
+.type-target {
+  font-size: 16.5px; background: var(--bg); border: 1px solid var(--border); border-radius: 12px;
+  padding: 16px; letter-spacing: 0.5px; overflow-x: auto; white-space: pre;
+}
+.tch { color: var(--text); }
+.tch.okc { color: #3fd96a; }
+.tch.badc { color: #ff8a82; background: rgba(229, 83, 75, 0.15); border-radius: 3px; }
+.tch.tsp { min-width: 8px; display: inline-block; }
+.type-input {
+  width: 100%; margin-top: 10px; background: var(--bg); color: var(--text);
+  border: 1px solid var(--border); border-radius: 10px; padding: 11px 13px;
+  font-size: 14.5px; outline: none;
+}
+.type-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(79, 140, 255, 0.14); }
+.type-round.typeish .type-target { animation: lockShake 0.35s ease; border-color: rgba(229, 83, 75, 0.5); }
+.mono { font-family: var(--mono); }
+.type-end-h { margin: 8px 0 0; }
+
+.simon-grid { display: grid; grid-template-columns: repeat(2, 120px); gap: 12px; justify-content: center; }
+.spad {
+  aspect-ratio: 1; border-radius: 20px; border: 1px solid var(--border);
+  background: color-mix(in srgb, var(--pc) 18%, var(--bg));
+  color: var(--pc); font-size: 26px; cursor: pointer; transition: all 0.15s ease;
+}
+.spad:hover { transform: scale(1.03); }
+.spad.lit {
+  background: var(--pc); color: #0d1117;
+  box-shadow: 0 0 34px var(--pc);
+  transform: scale(1.05);
+}
+@media (max-width: 520px) {
+  .simon-grid { grid-template-columns: repeat(2, minmax(90px, 1fr)); }
+  .mem-grid { gap: 8px; }
+}

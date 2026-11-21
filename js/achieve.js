@@ -15,7 +15,9 @@ window.CodeCampAchieve = (function () {
     { id: "quiz-80", icon: "🧠", name: "Cerveau turbo", desc: "Faire 80 pts ou plus au Quiz Arcade", test: function (s) { return s.quizBest >= 80; } },
     { id: "quiz-any", icon: "🎯", name: "Premier quiz", desc: "Terminer un quiz", test: function (s) { return s.quizPlayed; } },
     { id: "account", icon: "👑", name: "Membre officiel", desc: "Créer un compte visiteur", test: function (s) { return s.account; } },
-    { id: "codebot", icon: "🤖", name: "Esprit curieux", desc: "Poser une question à CodeBot", test: function (s) { return s.codebot; } }
+    { id: "codebot", icon: "🤖", name: "Esprit curieux", desc: "Poser une question à CodeBot", test: function (s) { return s.codebot; } },
+    { id: "arcade", icon: "🎮", name: "Joueur", desc: "Jouer à un mini-jeu d'arcade", test: function () { return flags(DONE_KEY, "__game"); } },
+    { id: "snake-10", icon: "🐍", name: "Serpent pro", desc: "Faire 10 points au Serpent du Code", test: function () { return flags(DONE_KEY, "__snake10"); } }
   ];
 
   function loadJson(key, fallback) {
@@ -106,5 +108,10 @@ window.CodeCampAchieve = (function () {
   window.addEventListener("hashchange", check);
   document.addEventListener("DOMContentLoaded", check);
 
-  return { grid: grid, check: check, unlockedCount: unlockedCount, total: LIST.length };
+  function mark(flag) {
+    flags(DONE_KEY, flag, true);
+    check();
+  }
+
+  return { grid: grid, check: check, unlockedCount: unlockedCount, total: LIST.length, mark: mark };
 })();
